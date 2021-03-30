@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_name"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_type"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_directory"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_path"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_date"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_size"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_folders"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginLeft="30dp"
+        android:textIsSelectable="true"
+        android:id="@+id/file_attribute_files"/>
+
+</LinearLayout>

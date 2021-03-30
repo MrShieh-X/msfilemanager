@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:scrollbarSize="5dp"
+    android:fadeScrollbars="false"
+    android:scrollbars="horizontal"
+    android:layout_height="match_parent">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:fillViewport="true"
+        android:scrollbarSize="5dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/text_editor_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:fillViewport="true"
+            android:gravity="top" />
+    </ScrollView>
+</HorizontalScrollView>

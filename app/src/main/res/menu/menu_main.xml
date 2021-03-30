@@ -1,0 +1,52 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.FileManagerActivity">
+    <item
+        android:id="@+id/action_create"
+        android:orderInCategory="100"
+        android:title="@string/action_create_name"
+        app:showAsAction="never">
+        <menu>
+        <item
+            android:id="@+id/action_create_a_folder"
+            android:orderInCategory="100"
+            android:title="@string/action_create_a_folder_name"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_create_a_file"
+            android:orderInCategory="100"
+            android:title="@string/action_create_a_file_name"
+            app:showAsAction="never" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/action_paste"
+        android:orderInCategory="100"
+        android:title="@string/action_paste_name"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_back"
+        android:orderInCategory="100"
+        android:title="@string/action_back_name"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sort_method"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings_name"
+        app:showAsAction="never" />
+    <!--item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:title="@string/action_about_name"
+        app:showAsAction="never" /-->
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="100"
+        android:title="@string/action_exit_name"
+        app:showAsAction="never" />
+</menu>

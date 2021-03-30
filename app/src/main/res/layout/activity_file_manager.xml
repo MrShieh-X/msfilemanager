@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center|start"
+            android:singleLine="true"
+            android:ellipsize="start"
+            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+            android:textSize="22sp"
+            android:textColor="#ffffff"
+            android:gravity="center|start"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/files"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fastScrollEnabled="true"
+        android:scrollbarStyle="outsideOverlay" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_colorNormal="#413F3F"
+        app:menu_colorPressed="#413F3F"
+        app:menu_colorRipple="#413F3F"
+        app:menu_fab_size="normal"
+        app:menu_icon="@drawable/fab_add"
+        android:gravity="bottom|end"
+        android:id="@+id/fab_buttons">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/create_folder"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:src="@drawable/fab_button_folder"
+            app:fab_label="@string/action_create_a_folder_name"
+            app:fab_colorNormal="#413F3F"
+            app:fab_colorPressed="#413F3F"
+            app:fab_colorRipple="#413F3F"
+            app:fab_size="normal"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/create_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/fab_button_file"
+            app:fab_colorNormal="#413F3F"
+            app:fab_colorPressed="#413F3F"
+            app:fab_colorRipple="#413F3F"
+            app:fab_label="@string/action_create_a_file_name"
+            app:fab_size="normal"/>
+
+    </com.github.clans.fab.FloatingActionMenu>
+    </RelativeLayout>
+</LinearLayout>

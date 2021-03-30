@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preference_settings_languages">
+        <item>@string/preference_settings_language_auto</item>
+        <item>English (US)</item>
+        <item>简体中文（中国）</item>
+    </string-array>
+    <string-array name="preference_settings_languages_values">
+        <item>auto</item>
+        <item>en_US</item>
+        <item>zh_CN</item>
+    </string-array>
+    <string-array name="preference_settings_startup_dir">
+        <item>@string/preference_settings_startup_dir_home</item>
+        <item>@string/preference_settings_startup_dir_last</item>
+    </string-array>
+    <string-array name="preference_settings_startup_dir_values">
+        <item>home</item>
+        <item>last</item>
+    </string-array>
+</resources>

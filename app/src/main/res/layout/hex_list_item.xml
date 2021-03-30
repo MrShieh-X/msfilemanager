@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_weight="1">
+
+        <EditText
+            android:id="@+id/hex_item_1st"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_2nd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_3rd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_4th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_5th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_6th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_7th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/hex_item_8th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="8"
+            android:background="@null"
+            android:digits="0123456789ABCDEF"
+            android:editable="false"
+            android:inputType=""
+            android:maxLength="2"
+            android:singleLine="true"
+            android:text="测试"
+            android:textAppearance="?android:textAppearanceMedium" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginEnd="3dp"
+        android:background="?android:attr/dividerVertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:layout_marginRight="7dp"
+        android:layout_marginEnd="7dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/hex_item_right_1st"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_2nd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_3rd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_4th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_5th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_6th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="C"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_7th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="A"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/hex_item_right_8th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLength="1"
+            android:singleLine="true"
+            android:text="A"
+            android:textAppearance="?android:textAppearanceMedium" />
+    </LinearLayout>
+</LinearLayout>
