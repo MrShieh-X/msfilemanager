@@ -10,8 +10,9 @@ Anyone can take advices of this application to us.
 
 ## Version
 The latest version: <br/>
-<b>1.0 (Mar. 30, 2021)</b><br/>
+<b>1.0.1 (Apr. 3, 2021)</b><br/>
 Historical version: <br/>
+<b>1.0.1 (Apr. 3, 2021)</b><br/>
 <b>1.0 (Mar. 30, 2021) (First version)</b><br/>
 
 ## The software configuration required for this application is:

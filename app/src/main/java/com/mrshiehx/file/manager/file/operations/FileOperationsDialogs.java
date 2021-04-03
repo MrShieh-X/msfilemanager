@@ -398,17 +398,15 @@ public class FileOperationsDialogs {
                 });
             }
             while (true) {
-                if (doneCopy) {
+                if (Integer.parseInt(processed.getText().toString())==Integer.parseInt(total.getText().toString())) {
                     doneCopy = false;
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            current.setText(R.string.dialog_file_copy_done);
-                            nDialog.dismiss();
-                            voib.execute();
-                        }
+                    ((Activity) context).runOnUiThread(() -> {
+                        current.setText(R.string.dialog_file_copy_done);
+                        nDialog.dismiss();
+                        voib.execute();
                     });
                     Looper.loop();
+                    break;
                 }
             }
         }).start();
