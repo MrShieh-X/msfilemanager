@@ -40,6 +40,7 @@ import com.mrshiehx.file.manager.interfaces.Void;
 import com.mrshiehx.file.manager.shared.variables.Commands;
 import com.mrshiehx.file.manager.shared.variables.FilePaths;
 import com.mrshiehx.file.manager.shared.variables.SharedVariables;
+import com.mrshiehx.file.manager.utils.FileUtils;
 import com.mrshiehx.file.manager.utils.SharedPreferencesGetter;
 import com.mrshiehx.file.manager.utils.SystemUtils;
 import com.mrshiehx.file.manager.utils.Utils;
@@ -68,6 +69,7 @@ public class FileManagerActivity extends BaseActivity {
     private int sortMethodNumber;
     private Map<File,String> position;
     private File copingFile;
+    private File movingFile;
 
     boolean ps;
     long firstTime;
@@ -78,8 +80,9 @@ public class FileManagerActivity extends BaseActivity {
     private final int FILE_ACTION_CHOOSE_OPEN_METHOD_NUMBER=0;
     private final int FILE_ACTION_RENAME_NUMBER=1;
     private final int FILE_ACTION_COPY_NUMBER=2;
-    private final int FILE_ACTION_DELETE_NUMBER=3;
-    private final int FILE_ACTION_ATTRIBUTES_NUMBER=4;
+    private final int FILE_ACTION_MOVE_NUMBER=3;
+    private final int FILE_ACTION_DELETE_NUMBER=4;
+    private final int FILE_ACTION_ATTRIBUTES_NUMBER=5;
 
     AlertDialog.Builder dialog_no_permissions;
     AlertDialog dialog_no_permissions_dialog;
@@ -396,6 +399,7 @@ public class FileManagerActivity extends BaseActivity {
                 menu.add(0, FILE_ACTION_CHOOSE_OPEN_METHOD_NUMBER, 0, getText(R.string.file_action_choose_open_method));
                 menu.add(0, FILE_ACTION_RENAME_NUMBER, 0, getText(R.string.file_action_rename));
                 menu.add(0, FILE_ACTION_COPY_NUMBER, 0, getText(R.string.file_action_copy));
+                menu.add(0, FILE_ACTION_MOVE_NUMBER, 0, getText(R.string.file_action_move));
                 menu.add(0, FILE_ACTION_DELETE_NUMBER, 0, getText(R.string.file_action_delete));
                 menu.add(0, FILE_ACTION_ATTRIBUTES_NUMBER, 0, getText(R.string.file_action_attribute));
             }
@@ -546,6 +550,15 @@ public class FileManagerActivity extends BaseActivity {
             case FILE_ACTION_COPY_NUMBER:
                 if(!item.isBacker()){
                     copingFile=file;
+                    movingFile=null;
+                }else{
+                    Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case FILE_ACTION_MOVE_NUMBER:
+                if(!item.isBacker()){
+                    movingFile=file;
+                    copingFile=null;
                 }else{
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
@@ -679,7 +692,7 @@ public class FileManagerActivity extends BaseActivity {
         if(sort!=null)
             sort.setTitle(String.format(getString(R.string.action_sort_method),sortMethod.getDisplayName()));
         if(paste!=null)
-            paste.setEnabled(copingFile!=null&&!copingFile.getParentFile().equals(currentFile));
+            paste.setEnabled((copingFile!=null&&!copingFile.getParentFile().equals(currentFile))||(movingFile!=null&&!movingFile.getParentFile().equals(currentFile)));
         return super.onMenuOpened(featureId, menu);
     }
 
@@ -743,21 +756,37 @@ public class FileManagerActivity extends BaseActivity {
                 dialog.show();
                 break;
             case R.id.action_paste:
-                if (copingFile != null) {
+                if(copingFile!=null){
                     if (!copingFile.getParentFile().equals(currentFile)) {
-                        if(copingFile.exists()) {
+                        if (copingFile.exists()) {
                             FileOperationsDialogs.showCopyDialog(context, copingFile, currentFile, () -> {
                                 copingFile = null;
                                 initFiles(currentFile);
                             });
-                        }else{
+                        } else {
                             Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
-                            currentFile=null;
+                            copingFile=null;
                         }
                     } else {
                         Toast.makeText(context, getText(R.string.message_paste_to_the_same_directory), Toast.LENGTH_SHORT).show();
                     }
-                } else {
+                }else if(movingFile!=null){
+                    if (!movingFile.getParentFile().equals(currentFile)) {
+                        if (movingFile.exists()) {
+                            FileOperationsDialogs.showMoveDialog(context, movingFile, currentFile, () -> {
+                                if(movingFile.isDirectory()) FileUtils.deleteDirectory(movingFile);
+                                else movingFile.delete();
+                                movingFile = null;
+                                initFiles(currentFile);
+                            });
+                        } else {
+                            Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
+                            movingFile = null;
+                        }
+                    } else {
+                        Toast.makeText(context, getText(R.string.message_paste_moved_to_the_same_directory), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
                     Toast.makeText(context, getText(R.string.message_no_pasteable_file), Toast.LENGTH_SHORT).show();
                 }
         }

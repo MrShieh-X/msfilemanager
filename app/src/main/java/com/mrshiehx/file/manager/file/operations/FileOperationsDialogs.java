@@ -323,12 +323,20 @@ public class FileOperationsDialogs {
         dialog.show();
     }
 
+    public static void showCopyDialog(Context context, File source, File to, Void voib) {
+        showCopyDialog(context, source, to, voib,getText(R.string.dialog_file_copy_title),getText(R.string.dialog_file_copy_to));
+    }
+
+    public static void showMoveDialog(Context context, File source, File to, Void voib) {
+        showCopyDialog(context, source, to, voib,getText(R.string.dialog_file_move_title),getText(R.string.dialog_file_move_to));
+    }
+
     /**
      * @param to The parent not son
      **/
-    public static void showCopyDialog(Context context, File source, File to, Void voib) {
+    public static void showCopyDialog(Context context, File source, File to, Void voib, CharSequence title,CharSequence copyToText) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle(R.string.dialog_file_copy_title);
+        dialog.setTitle(title);
         dialog.setCancelable(false);
         final View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_file_copy, null);
         dialog.setView(dialogView);
@@ -336,6 +344,8 @@ public class FileOperationsDialogs {
         TextView current = dialogView.findViewById(R.id.dialog_copy_current);
         TextView sourceTv = dialogView.findViewById(R.id.dialog_copy_source);
         TextView toTv = dialogView.findViewById(R.id.dialog_copy_to);
+        TextView toTextTv = dialogView.findViewById(R.id.dialog_copy_to_text);
+        toTextTv.setText(copyToText);
         sourceTv.setText(source.getAbsolutePath());
         toTv.setText(FileUtils.addSeparatorToPath(to.getAbsolutePath()));
         AlertDialog nDialog = dialog.show();

@@ -46,6 +46,8 @@
     <string name="dialog_file_copy_current">当前：</string>
     <string name="dialog_file_copy_source">源文件：</string>
     <string name="dialog_file_copy_to">复制到：</string>
+    <string name="dialog_file_move_to">移动到：</string>
+    <string name="dialog_file_move_title">移动文件</string>
     <string name="dialog_file_copy_total">文件总数：</string>
     <string name="dialog_file_copy_remaining">剩余文件：</string>
     <string name="dialog_copy_file_exists_replace">替换</string>
@@ -95,6 +97,7 @@
     <string name="file_action_choose_open_method">选择打开方式</string>
     <string name="file_action_rename">重命名</string>
     <string name="file_action_copy">复制</string>
+    <string name="file_action_move">移动</string>
     <string name="file_action_delete">删除</string>
     <string name="file_action_attribute">属性</string>
     <string name="file_viewer_hex_editor">HEX编辑器</string>
@@ -128,6 +131,7 @@
     <string name="message_failed_to_get_apk_information">获得APK文件信息失败</string>
     <string name="message_no_pasteable_file">没有可粘贴的文件</string>
     <string name="message_paste_to_the_same_directory">不能将复制的文件粘贴到同一目录下</string>
+    <string name="message_paste_moved_to_the_same_directory">不能将移动的文件粘贴到同一目录下</string>
     <string name="message_failed_to_copy_files">复制文件失败</string>
     <string name="message_go_to_file_not_exists">%s：目标目录不存在</string>
     <string name="message_go_to_file_is_file">%s：目标目录是个文件</string>

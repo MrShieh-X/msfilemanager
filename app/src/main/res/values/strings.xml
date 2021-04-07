@@ -46,6 +46,8 @@
     <string name="dialog_file_copy_current">"Current File: "</string>
     <string name="dialog_file_copy_source">"Source File: "</string>
     <string name="dialog_file_copy_to">"Copy To: "</string>
+    <string name="dialog_file_move_to">"Move To: "</string>
+    <string name="dialog_file_move_title">Move Files</string>
     <string name="dialog_file_copy_total">"Total Number of Files: "</string>
     <string name="dialog_file_copy_remaining">"Remaining Files: "</string>
     <string name="dialog_copy_file_exists_replace">Replace</string>
@@ -95,6 +97,7 @@
     <string name="file_action_choose_open_method">Choose a Open Method</string>
     <string name="file_action_rename">Rename</string>
     <string name="file_action_copy">Copy</string>
+    <string name="file_action_move">Move</string>
     <string name="file_action_delete">Delete</string>
     <string name="file_action_attribute">Attributes</string>
     <string name="file_viewer_hex_editor">HEX Editor</string>
@@ -128,6 +131,7 @@
     <string name="message_failed_to_get_apk_information">Failed to get the information of this APK file</string>
     <string name="message_no_pasteable_file">No files to paste</string>
     <string name="message_paste_to_the_same_directory">Cannot paste the copied file into the same directory</string>
+    <string name="message_paste_moved_to_the_same_directory">Cannot paste the moved file into the same directory</string>
     <string name="message_failed_to_copy_files">Failed to copy files</string>
     <string name="message_go_to_file_not_exists">%s: The target directory does not exist</string>
     <string name="message_go_to_file_is_file">%s: The target directory is a file</string>
