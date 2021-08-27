@@ -10,16 +10,18 @@ import android.widget.TextView;
 
 import com.mrshiehx.file.manager.R;
 import com.mrshiehx.file.manager.beans.FileItem;
+import com.mrshiehx.file.manager.enums.FileType;
 import com.mrshiehx.file.manager.utils.SharedPreferencesGetter;
 
 import java.io.File;
 import java.util.List;
 
-public class FilesAdapter extends ArrayAdapter {
+public class FilesAdapter extends ArrayAdapter<FileItem> {
     private final Context context;
     private final List<FileItem> files;
     public View convertView;
     public ViewGroup parent;
+    public int scrollStatus;
 
     public FilesAdapter(Context context, List<FileItem> files) {
         super(context,R.layout.file_item,files);
@@ -33,7 +35,7 @@ public class FilesAdapter extends ArrayAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public FileItem getItem(int position) {
         return files.get(position);
     }
 
@@ -96,7 +98,20 @@ public class FilesAdapter extends ArrayAdapter {
         }else{
             viewHolder.date.setVisibility(View.INVISIBLE);
         }
-        switch (fileItem.getType()){
+        if(fileItem.getType()== FileType.PICTURE
+                ||fileItem.getType()== FileType.VIDEO
+                ||fileItem.getType()== FileType.APK) {
+            if (fileItem.picture != null) {
+                viewHolder.icon.setImageDrawable(fileItem.picture);
+            } else if (scrollStatus == 0 || scrollStatus == 1) {
+                viewHolder.icon.setImageDrawable(fileItem.getIcon());
+            } else {
+                viewHolder.icon.setImageDrawable(fileItem.getType().getIcon());
+            }
+        }else{
+            viewHolder.icon.setImageDrawable(fileItem.getIcon());
+        }
+        /*switch (fileItem.getType()){
             case PICTURE:
             case VIDEO:
             case APK:
@@ -106,7 +121,7 @@ public class FilesAdapter extends ArrayAdapter {
             default:
                 viewHolder.icon.setImageDrawable(fileItem.getIcon());
                 break;
-        }
+        }*/
         return view;
     }
 

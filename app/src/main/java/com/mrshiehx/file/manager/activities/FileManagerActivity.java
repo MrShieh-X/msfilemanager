@@ -14,7 +14,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -164,6 +166,39 @@ public class FileManagerActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         filesListView.setDividerHeight(0);
+
+        filesListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                // TODO Auto-generated method stub
+                ListAdapter listAdapter = view.getAdapter();
+                if (listAdapter instanceof FilesAdapter) {
+                    FilesAdapter adapter=(FilesAdapter)listAdapter;
+                    switch (scrollState) {
+                        case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止  0
+                            adapter.scrollStatus = 0;
+                            adapter.notifyDataSetChanged();
+                            //System.out.println("停止");
+                            break;
+                        case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL://触摸滑动  1
+                            adapter.scrollStatus = 1;
+
+                            //System.out.println("触摸滑动");
+                            break;
+                        case AbsListView.OnScrollListener.SCROLL_STATE_FLING://快速滑动    2
+                            adapter.scrollStatus = 2;
+                            //System.out.println("快速滑动");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            }
+        });
     }
 
     void initFiles(File fileF) {

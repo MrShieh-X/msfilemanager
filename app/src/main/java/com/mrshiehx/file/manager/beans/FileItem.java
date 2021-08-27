@@ -26,6 +26,8 @@ public class FileItem {
     private Drawable smallIcon;
     private boolean isBacker;
 
+    public Drawable picture;
+
     public FileItem(File file){
         this(file,null);
     }

@@ -1,5 +1,6 @@
 package com.mrshiehx.file.manager.enums;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.mrshiehx.file.manager.R;
@@ -9,9 +10,10 @@ import com.mrshiehx.file.manager.file.openers.FileOpener;
 import com.mrshiehx.file.manager.file.openers.PictureFileOpener;
 import com.mrshiehx.file.manager.file.openers.TextFileOpener;
 import com.mrshiehx.file.manager.file.openers.VideoFileOpener;
+import com.mrshiehx.file.manager.utils.ImageUtils;
 
 import static com.mrshiehx.file.manager.utils.ResourceUtils.getDrawable;
-import static com.mrshiehx.file.manager.utils.ResourceUtils.*;
+import static com.mrshiehx.file.manager.utils.ResourceUtils.getTextByLocale;
 
 public enum FileType {
     FOLDER(getDrawable(R.drawable.gray_file_type_folder),getTextByLocale(R.string.file_type_folder)),
@@ -36,6 +38,10 @@ public enum FileType {
 
     public Drawable getIcon() {
         return icon;
+    }
+
+    public Bitmap getIconBitmap() {
+        return ImageUtils.drawable2Bitmap(icon);
     }
 
     public CharSequence getDisplayName() {

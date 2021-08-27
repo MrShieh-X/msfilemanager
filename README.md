@@ -10,8 +10,9 @@ Anyone can take advices of this application to us.
 
 ## Version
 The latest version: <br/>
-<b>1.1 (Apr. 7, 2021)</b><br/>
+<b>1.1.1 (Aug. 27, 2021)</b><br/>
 Historical version: <br/>
+<b>1.1.1 (Aug. 27, 2021)</b><br/>
 <b>1.1 (Apr. 7, 2021)</b><br/>
 <b>1.0.1 (Apr. 3, 2021)</b><br/>
 <b>1.0 (Mar. 30, 2021) (First version)</b><br/>
@@ -25,6 +26,7 @@ You can set the language in the settings.
 - Simplified Chinese (China)
 
 ## Found BUGs
+- Browsing directories with many large picture files will get stuck.
 - Unable to access the root directory.
 
 ## About Author
