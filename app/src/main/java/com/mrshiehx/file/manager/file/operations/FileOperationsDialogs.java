@@ -327,9 +327,10 @@ public class FileOperationsDialogs {
         showCopyDialog(context, source, to, voib,getText(R.string.dialog_file_copy_title),getText(R.string.dialog_file_copy_to));
     }
 
-    public static void showMoveDialog(Context context, File source, File to, Void voib) {
-        showCopyDialog(context, source, to, voib,getText(R.string.dialog_file_move_title),getText(R.string.dialog_file_move_to));
-    }
+    /*public static void showMoveDialog(Context context, File source, File to, Void voib) {
+        //showCopyDialog(context, source, to, voib,getText(R.string.dialog_file_move_title),getText(R.string.dialog_file_move_to));
+        source.renameTo(new File(to, source.getName()));
+    }*/
 
     /**
      * @param to The parent not son
@@ -382,7 +383,7 @@ public class FileOperationsDialogs {
                 if (source.isDirectory()) {
                     copyDirectory(context, source, to.getAbsolutePath(), source.getName(), progressBar, current, remaining, percentage, processed,failed);
                 } else {
-                    copyFile(context, source, new File(to, source.getName()), progressBar, current, remaining, percentage, processed,failed);
+                    copyFile(context, source, new File(to, source.getName()), progressBar, current, remaining, percentage, processed,failed,false);
                 }
                 if(failed.size()>0) {
                     StringBuilder faileds = new StringBuilder();
@@ -442,7 +443,7 @@ public class FileOperationsDialogs {
                 if (from.listFiles() != null) {
                     for (File file : from.listFiles()) {
                         if (file.isFile()) {
-                            copyFile(context, file, new File(to, file.getName()), progressBar, current, remaining, percentage, processed,failed);
+                            copyFile(context, file, new File(to, file.getName()), progressBar, current, remaining, percentage, processed,failed,false);
                         } else {
                             copyDirectory(context, file, to.getAbsolutePath(), file.getName(), progressBar, current, remaining, percentage, processed,failed);
                         }
@@ -472,7 +473,7 @@ public class FileOperationsDialogs {
                                             if (from.listFiles() != null) {
                                                 for (File file : from.listFiles()) {
                                                     if (file.isFile()) {
-                                                        copyFile(context, file, new File(to, file.getName()), progressBar, current, remaining, percentage, processed,failed);
+                                                        copyFile(context, file, new File(to, file.getName()), progressBar, current, remaining, percentage, processed,failed,false);
                                                     } else {
                                                         copyDirectory(context, file, to.getAbsolutePath(), file.getName(), progressBar, current, remaining, percentage, processed,failed);
                                                     }
@@ -520,7 +521,7 @@ public class FileOperationsDialogs {
         }
     }
 
-    private static void copyFile(Context context, File source, File to, ProgressBar progressBar, TextView current, TextView remaining, TextView percentage, TextView processed, List<String>failed)
+    private static void copyFile(Context context, File source, File to, ProgressBar progressBar, TextView current, TextView remaining, TextView percentage, TextView processed, List<String>failed, boolean isMove)
             throws IOException {
         if (null == source) return;
         if (source.isDirectory())
@@ -540,7 +541,8 @@ public class FileOperationsDialogs {
                                 try {
                                     to.delete();
                                     to.createNewFile();
-                                    FileUtils.copy(source, to);
+                                    if(isMove)source.renameTo(to);
+                                    else FileUtils.copy(source, to);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -573,7 +575,8 @@ public class FileOperationsDialogs {
         } else {
             to.createNewFile();
             try {
-                FileUtils.copy(source, to);
+                if(isMove)source.renameTo(to);
+                    else FileUtils.copy(source, to);
             }catch (IOException e){
                 e.printStackTrace();
                 failed.add(source.getAbsolutePath());

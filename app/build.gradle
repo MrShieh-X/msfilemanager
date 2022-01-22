@@ -10,8 +10,8 @@ android {
         applicationId "com.mrshiehx.file.manager"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 4
-        versionName "1.1.1"
+        versionCode 5
+        versionName "1.1.2"
         archivesBaseName = "msfm_${versionName}".replace(' ', '_')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

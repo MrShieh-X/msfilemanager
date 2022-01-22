@@ -42,7 +42,6 @@ import com.mrshiehx.file.manager.interfaces.Void;
 import com.mrshiehx.file.manager.shared.variables.Commands;
 import com.mrshiehx.file.manager.shared.variables.FilePaths;
 import com.mrshiehx.file.manager.shared.variables.SharedVariables;
-import com.mrshiehx.file.manager.utils.FileUtils;
 import com.mrshiehx.file.manager.utils.SharedPreferencesGetter;
 import com.mrshiehx.file.manager.utils.SystemUtils;
 import com.mrshiehx.file.manager.utils.Utils;
@@ -808,12 +807,16 @@ public class FileManagerActivity extends BaseActivity {
                 }else if(movingFile!=null){
                     if (!movingFile.getParentFile().equals(currentFile)) {
                         if (movingFile.exists()) {
-                            FileOperationsDialogs.showMoveDialog(context, movingFile, currentFile, () -> {
+                            movingFile.renameTo(new File(currentFile, movingFile.getName()));
+                            movingFile = null;
+                            initFiles(currentFile);
+
+                            /*FileOperationsDialogs.showMoveDialog(context, movingFile, currentFile, () -> {
                                 if(movingFile.isDirectory()) FileUtils.deleteDirectory(movingFile);
                                 else movingFile.delete();
                                 movingFile = null;
                                 initFiles(currentFile);
-                            });
+                            });*/
                         } else {
                             Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
                             movingFile = null;

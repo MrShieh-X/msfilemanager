@@ -143,4 +143,5 @@
     <string name="message_failed_to_play_audio">播放音频失败</string>
     <string name="message_failed_to_load_picture">加载图片失败</string>
     <string name="message_target_file_not_exists">目标文件或文件夹不存在</string>
+    <string name="message_failed_to_move_files">移动文件失败</string>
 </resources>

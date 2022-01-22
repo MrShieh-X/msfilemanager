@@ -5,5 +5,9 @@
   "jpeg": "picture",
   "mp3": "audio",
   "mp4": "video",
-  "apk": "apk"
+  "apk": "apk",
+  "flac": "audio",
+  "json": "text",
+  "java": "text",
+  "xml": "text"
 }

@@ -143,4 +143,5 @@
     <string name="message_failed_to_play_audio">Failed to play the audio</string>
     <string name="message_failed_to_load_picture">Failed to load the image</string>
     <string name="message_target_file_not_exists">The target file or folder does not exist</string>
+    <string name="message_failed_to_move_files">Failed to move files</string>
 </resources>
