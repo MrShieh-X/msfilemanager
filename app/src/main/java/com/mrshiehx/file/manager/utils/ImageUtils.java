@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
+
+import com.mrshiehx.file.manager.application.MSFMApplication;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -101,8 +104,44 @@ public class ImageUtils {
     }
 
     public static Drawable bitmap2Drawable(Bitmap bitmap) {
-        BitmapDrawable bd = new BitmapDrawable(bitmap);
-        Drawable d = (Drawable) bd;
-        return d;
+        return new BitmapDrawable(MSFMApplication.getContext().getResources(), bitmap);
+    }
+
+    /**
+     * 根据指定的图像路径和大小来获取缩略图
+     * 此方法有两点好处：
+     * 1. 使用较小的内存空间，第一次获取的bitmap实际上为null，只是为了读取宽度和高度，
+     * 第二次读取的bitmap是根据比例压缩过的图像，第三次读取的bitmap是所要的缩略图。
+     * 2. 缩略图对于原图像来讲没有拉伸，这里使用了2.2版本的新工具ThumbnailUtils，使
+     * 用这个工具生成的图像不会被拉伸。
+     *
+     * @param bytes  图像字节
+     * @param width  指定输出图像的宽度
+     * @param height 指定输出图像的高度
+     * @return 生成的缩略图
+     */
+    public static Bitmap getImageThumbnail(byte[] bytes, int width, int height) {
+        Bitmap bitmap;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        // 获取这个图片的宽和高，注意此处的bitmap为null
+        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        options.inJustDecodeBounds = false; // 设为 false
+        // 计算缩放比
+        int h = options.outHeight;
+        int w = options.outWidth;
+        int beWidth = w / width;
+        int beHeight = h / height;
+        int be = Math.min(beWidth, beHeight);
+        if (be <= 0) {
+            be = 1;
+        }
+        options.inSampleSize = be;
+        // 重新读入图片，读取缩放后的bitmap，注意这次要把options.inJustDecodeBounds 设为 false
+        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        // 利用ThumbnailUtils来创建缩略图，这里要指定要缩放哪个Bitmap对象
+        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
+                ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+        return bitmap;
     }
 }

@@ -8,16 +8,16 @@
         android:title="@string/action_create_name"
         app:showAsAction="never">
         <menu>
-        <item
-            android:id="@+id/action_create_a_folder"
-            android:orderInCategory="100"
-            android:title="@string/action_create_a_folder_name"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/action_create_a_file"
-            android:orderInCategory="100"
-            android:title="@string/action_create_a_file_name"
-            app:showAsAction="never" />
+            <item
+                android:id="@+id/action_create_a_folder"
+                android:orderInCategory="100"
+                android:title="@string/action_create_a_folder_name"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/action_create_a_file"
+                android:orderInCategory="100"
+                android:title="@string/action_create_a_file_name"
+                app:showAsAction="never" />
         </menu>
     </item>
     <item

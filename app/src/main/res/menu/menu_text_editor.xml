@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:title="@string/action_save_name"
-        android:id="@+id/action_text_editor_save"/>
+        android:id="@+id/action_text_editor_save" />
 
 </menu>

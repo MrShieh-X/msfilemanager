@@ -1,43 +1,52 @@
 package com.mrshiehx.file.manager.file.operations;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.widget.TextView;
 
 import androidx.core.content.FileProvider;
 
-import com.mrshiehx.file.manager.beans.FileItem;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
+import com.mrshiehx.file.manager.beans.fileItem.FileItem;
+import com.mrshiehx.file.manager.beans.fileItem.RootFileItem;
 import com.mrshiehx.file.manager.file.openers.FileOpener;
 import com.mrshiehx.file.manager.shared.variables.SharedVariables;
-import com.mrshiehx.file.manager.utils.FileUtils;
+import com.mrshiehx.file.manager.utils.LsParser;
 import com.mrshiehx.file.manager.utils.MIMETypeUtils;
+import com.mrshiehx.file.manager.utils.PathUtils;
+import com.mrshiehx.file.manager.utils.ShellUtils;
+import com.mrshiehx.file.manager.utils.Utils;
 
 import java.io.File;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FileOperations {
-    private FileOperations(){}
-    public static void openFile(Context context,FileItem item, File file){
-        FileOpener opener=item.getOpener();
-        if(opener!=null){
-            opener.open(context,file);
-        }else{
-            FileOperationsDialogs.showOpenMethodDialog(context,file);
+    private FileOperations() {
+    }
+
+    public static void openFile(Context context, AbstractFileItem item) {
+        FileOpener opener = item.getOpener();
+        if (opener != null) {
+            opener.open(context, item);
+        } else {
+            FileOperationsDialogs.showOpenMethodDialog(context, item);
             //Toast.makeText(context, getText(R.string.message_unopenable_file), Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static void installApk(Context context,File file){
+    public static void installApk(Context context, AbstractFileItem file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         //安装完成后，启动app（源码中少了这句话）
         try {
             //兼容7.0
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Uri contentUri = FileProvider.getUriForFile(context, SharedVariables.getFileProviderPackageName(), file);
+                Uri contentUri = FileProvider.getUriForFile(context, SharedVariables.getFileProviderPackageName(), new File(file.getAbsolutePath()));
                 intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     boolean hasInstallPermission = context.getPackageManager().canRequestPackageInstalls();
@@ -49,166 +58,136 @@ public class FileOperations {
                     }
                 }
             } else {
-                intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                intent.setDataAndType(Uri.fromFile(new File(file.getAbsolutePath())), "application/vnd.android.package-archive");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
             if (context.getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
                 context.startActivity(intent);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * (Useless) Calculate the size, folders number and files number of the file
-     * @param activity The first param is {@link android.app.Activity} not {@link android.content.Context} because the method runOnUiThread is not in {@link android.content.Context}
+     * Calculate the size, folders number and files number of the file
+     *
      * @param file Target File or Folder
-     * @param bytes The TextView for showing files bytes, could be null
-     * @param formatted The TextView for showing the formatted size of files, could be null
-     * @param foldersTv The TextView for showing folders number, could be null
-     * @param filesTV The TextView for showing files number, could be null
-     * @param add don't explain formatted don't do it
-     * @return [0]:file or folder size [1]:folders number [2]:files number
+     * @return A long array: [0]: file or folder size; [1]: folders number; [2]: files number. If the thread is interrupted suddenly, it will return null
      **/
-    public static long[] calculate(Activity activity, File file, TextView bytes, TextView formatted, TextView foldersTv, TextView filesTV, boolean add){
-        long size=0;
-        long folders=0;
-        long files=0;
-        File[] fileList = file.listFiles();
-        if(fileList!=null) {
-            if(file.isDirectory()) {
-                for (File value : fileList) {
-                    if (value.isDirectory()) {
-                        long[]var=calculate(activity,value,bytes,formatted,foldersTv,filesTV,add);
-                        size = size + (long) var[0];
-                        folders++;
-                        folders+=(int)var[1];
-                        files+=(int)var[2];
-                    } else {
-                        size = size + value.length();
-                        files++;
-                        if(filesTV!=null){
-                            long finalFiles = files;
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(add){
-                                        filesTV.setText(String.valueOf(Integer.parseInt((String)filesTV.getText())+1));
-
-                                    }else {
-                                        filesTV.setText(String.valueOf(finalFiles));
-                                    }
-                                }
-                            });
-                        }
-                        if(bytes!=null){
-                            long finalBytes = size;
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(add){
-                                        bytes.setText(String.valueOf(Long.parseLong((String)bytes.getText())+value.length()));
-                                    }else {
-                                        bytes.setText(String.valueOf(finalBytes));
-                                    }
-                                }
-                            });
-                        }
-                        if(formatted!=null){
-                            long finalBytes = size;
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    formatted.setText(FileUtils.getFormatSize(finalBytes));
-                                }
-                            });
-                        }
-                    }
-                }
-            }else{
-                files++;
-                size+=file.length();
-                if(filesTV!=null){
-                    long finalFiles = files;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(add){
-                                filesTV.setText(String.valueOf(Integer.parseInt((String)filesTV.getText())+1));
-
-                            }else {
-                                filesTV.setText(String.valueOf(finalFiles));
-                            }
-                        }
-                    });
-                }
-                if(bytes!=null){
-                    long finalBytes = size;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(add){
-                                bytes.setText(String.valueOf(Long.parseLong((String)bytes.getText())+file.length()));
-                            }else {
-                                bytes.setText(String.valueOf(finalBytes));
-                            }
-                        }
-                    });
-                }
-                if(formatted!=null){
-                    long finalBytes = size;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            formatted.setText(FileUtils.getFormatSize(finalBytes));
-                        }
-                    });
-                }
-            }
+    public static long[] calculate(AbstractFileItem file) {
+        if (file instanceof FileItem) {
+            return calculate(((FileItem) file).getFile());
+        } else if (file instanceof RootFileItem) {
+            return calculate(((RootFileItem) file));
         }
-        return new long[]{size,folders,files};
+        return null;
     }
-
-
 
     /**
-     * Calculate the size, folders number and files number of the file
-     * @param file Target File or Folder
-     * @return [0]:file or folder size [1]:folders number [2]:files number
-     **/
-    public static long[] calculate(File file){
-        long size=0;
-        long folders=0;
-        long files=0;
-        File[] fileList = file.listFiles();
-        if(fileList!=null) {
-            if(file.isDirectory()) {
-                for (File value : fileList) {
-                    if (value.isDirectory()) {
-                        long[]var=calculate(value);
-                        size = size + (long) var[0];
+     * @see #calculate(AbstractFileItem)
+     */
+    public static long[] calculate(RootFileItem item) {
+        long totalSize = 0;
+        long folders = 0;
+        long files = 0;
+        try {
+            List<String> out = ShellUtils.executeSuCommand("ls -a -R -l '" + PathUtils.toDirectoryPath(item.getAbsolutePath()) + "'").getOut();
+            String pathNow = null;
+            // <父,     Map<子,     大小>>
+            Map<String, Map<String, Long>> map = new HashMap<>();
+            for (int i = 0; i < out.size(); i++) {
+                String s = out.get(i);
+                if (s.isEmpty()) {
+                    //pathNow = null;
+                    continue;
+                }
+                if (s.startsWith("total "))
+                    continue;
+
+                if ((i == 0 || out.get(i - 1).isEmpty()) && (s.length() > 1 && s.endsWith(":"))) {
+                    pathNow = PathUtils.toDirectoryPath(s.substring(0, s.length() - 1).replaceAll("/+", "/"));
+                    map.put(pathNow, new HashMap<>());
+                    continue;
+                }
+                if (Thread.currentThread().isInterrupted()) return null;
+
+                if (!Utils.isEmpty(pathNow)) {
+                    try {
+                        LsParser lsParser = new LsParser(s, null);
+                        String name = lsParser.getOnlyFileName();
+                        if (name.equals("..") || name.equals("."))
+                            continue;
+                        String absPath = pathNow + name;
+                        long size = lsParser.getFileSize();
+                        map.get(pathNow).put(absPath, size);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (Thread.currentThread().isInterrupted()) return null;
+
+            for (Map.Entry<String, Map<String, Long>> e1 : map.entrySet()) {
+                for (Map.Entry<String, Long> e2 : e1.getValue().entrySet()) {
+                    if (Thread.currentThread().isInterrupted()) return null;
+                    String path = e2.getKey();
+                    if (map.containsKey(PathUtils.toDirectoryPath(path))) {
                         folders++;
-                        folders+=(int)var[1];
-                        files+=(int)var[2];
+                    } else {
+                        files++;
+                        totalSize += e2.getValue();
+                    }
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new long[]{totalSize, folders, files};
+    }
+
+    /**
+     * @see #calculate(AbstractFileItem)
+     */
+    public static long[] calculate(File file) {
+        long size = 0;
+        long folders = 0;
+        long files = 0;
+        File[] fileList = file.listFiles();
+        if (fileList != null) {
+            if (file.isDirectory()) {
+                for (File value : fileList) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        return null;
+                    }
+
+                    if (value.isDirectory()) {
+                        long[] var = calculate(value);
+                        if (var == null) continue;
+                        size = size + var[0];
+                        folders++;
+                        folders += var[1];
+                        files += var[2];
                     } else {
                         size = size + value.length();
                         files++;
                     }
                 }
-            }else{
+            } else {
                 files++;
-                size+=file.length();
+                size += file.length();
             }
         }
-        return new long[]{size,folders,files};
+        return new long[]{size, folders, files};
     }
 
-    public static void openFileByOtherApplication(Context context, File file) {
+    public static void openFileByOtherApplication(Context context, AbstractFileItem file) {
         openFileByOtherApplication(context, file, MIMETypeUtils.getMIMEType(file.getAbsolutePath()));
     }
 
-    public static void openFileByOtherApplication(Context context, File file, String type){
+    public static void openFileByOtherApplication(Context context, AbstractFileItem file, String type) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         //intent.addCategory(Intent.CATEGORY_DEFAULT);
         Uri uriForFile;
@@ -216,10 +195,10 @@ public class FileOperations {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             uriForFile = FileProvider.getUriForFile(context,
                     SharedVariables.getFileProviderPackageName(),
-                    file);
+                    new File(file.getAbsolutePath()));
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } else {
-            uriForFile = Uri.fromFile(file);
+            uriForFile = Uri.fromFile(new File(file.getAbsolutePath()));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         intent.setDataAndType(uriForFile, type);

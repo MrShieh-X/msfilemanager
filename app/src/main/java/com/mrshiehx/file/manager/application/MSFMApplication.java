@@ -10,11 +10,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MSFMApplication extends Application {
-    private List<Activity> activityList = new LinkedList<Activity>();
+    private final List<Activity> activityList = new LinkedList<Activity>();
     private static MSFMApplication instance;
     static Context context;
     static SharedPreferences sharedPreferences;
 
+    /*private Process process;
+
+    public Process getRootProcess() throws Exception {
+        if (process == null) {
+            process = Runtime.getRuntime().exec("su");
+            if (process.waitFor() != 0) {
+                process = null;
+                throw new Exception(getText(R.string.message_failed_to_get_root).toString());
+            }
+        }
+        return process;
+    }*/
     public MSFMApplication() {
     }
 

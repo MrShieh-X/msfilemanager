@@ -11,75 +11,85 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.mrshiehx.file.manager.R;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
 import com.mrshiehx.file.manager.utils.ApplicationUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class AudioFileOpener implements FileOpener{
+public class AudioFileOpener implements FileOpener {
     @Override
-    public void open(Context context, File file) {
-        AlertDialog.Builder dialog=new AlertDialog.Builder(context);
+    public void open(Context context, AbstractFileItem file) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle(R.string.file_viewer_audio_player);
         dialog.setCancelable(false);
-        View view=LayoutInflater.from(context).inflate(R.layout.dialog_audio_player,null);
-        TextView name=view.findViewById(R.id.audio_name);
-        SeekBar progress=view.findViewById(R.id.audio_seekbar);
-        TextView remaining=view.findViewById(R.id.audio_remaining);
-        TextView total=view.findViewById(R.id.audio_total);
-        Button operate=view.findViewById(R.id.audio_operate);
-        Button close=view.findViewById(R.id.audio_close);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_audio_player, null);
+        TextView name = view.findViewById(R.id.audio_name);
+        SeekBar progress = view.findViewById(R.id.audio_seekbar);
+        TextView remaining = view.findViewById(R.id.audio_remaining);
+        TextView total = view.findViewById(R.id.audio_total);
+        Button operate = view.findViewById(R.id.audio_operate);
+        Button close = view.findViewById(R.id.audio_close);
         name.setText(file.getName());
         dialog.setView(view);
         MediaPlayer mediaPlayer = new MediaPlayer();
         operate.setOnClickListener(v -> {
-            if(mediaPlayer.isPlaying()){
+            if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
                 operate.setText(R.string.dialog_audio_player_button_play);
-            }else{
+            } else {
                 mediaPlayer.start();
                 operate.setText(R.string.dialog_audio_player_button_stop);
             }
         });
+
         try {
             mediaPlayer.setDataSource(file.getAbsolutePath());
             mediaPlayer.setLooping(false);
             mediaPlayer.prepare();
-            mediaPlayer.start();
+            new Thread(mediaPlayer::start).start();
             operate.setText(R.string.dialog_audio_player_button_stop);
-            total.setText(method01(mediaPlayer.getDuration()));
-            progress.setMax(mediaPlayer.getDuration()/1000);
-            AlertDialog alertDialog=dialog.show();
-            Thread thread=new Thread(()->{
-                while (true){
-                    String str=method01(mediaPlayer.getCurrentPosition());
-                    ((Activity)context).runOnUiThread(()->{
-                        remaining.setText(str);
-                        progress.setProgress(mediaPlayer.getCurrentPosition()/1000);
+            total.setText(millisToTextTime(mediaPlayer.getDuration()));
+            progress.setMax(mediaPlayer.getDuration() / 1000);
+            AlertDialog alertDialog = dialog.show();
+
+            final boolean[] touching = {false};
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    int current = mediaPlayer.getCurrentPosition();
+                    String str = millisToTextTime(current);
+                    ((Activity) context).runOnUiThread(() -> {
+                        if (!touching[0]) {
+                            remaining.setText(str);
+                            progress.setProgress(current / 1000);
+                        }
                     });
-                    if(mediaPlayer.isPlaying()){
-                        ((Activity)context).runOnUiThread(()->operate.setText(R.string.dialog_audio_player_button_stop));
-                    }else{
-                        ((Activity)context).runOnUiThread(()->operate.setText(R.string.dialog_audio_player_button_play));
-                    }
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+
+                    if (mediaPlayer.isPlaying()) {
+                        ((Activity) context).runOnUiThread(() -> operate.setText(R.string.dialog_audio_player_button_stop));
+                    } else {
+                        ((Activity) context).runOnUiThread(() -> operate.setText(R.string.dialog_audio_player_button_play));
                     }
                 }
-            });
-            thread.start();
+            }, 0, 200);
             progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    mediaPlayer.seekTo(seekBar.getProgress()*1000);
+                    String str = millisToTextTime(progress * 1000);
+                    remaining.setText(str);
                 }
+
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
+                    touching[0] = true;
                 }
+
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
+                    touching[0] = false;
+                    mediaPlayer.seekTo(seekBar.getProgress() * 1000);
                 }
             });
             /*dialog.setOnCancelListener(dialog1 ->{
@@ -90,27 +100,26 @@ public class AudioFileOpener implements FileOpener{
             });*/
             close.setOnClickListener(var -> {
                 mediaPlayer.stop();
-                thread.interrupt();
-                //thread2.interrupt();
+                timer.cancel();
                 alertDialog.dismiss();
             });
-        }catch (IOException e){
+        } catch (Exception e) {
             e.printStackTrace();
-            ApplicationUtils.showDialog(context,context.getText(R.string.message_failed_to_play_audio),e.toString(),null,null,null,null,null,null,true);
+            ApplicationUtils.showDialog(context, context.getText(R.string.message_failed_to_play_audio), e.toString(), null, null, null, null, null, null, true);
         }
     }
 
-    private String method01(int millis){
-        int seconds=millis/1000;
-        int shang=seconds/60;
-        int yushu=seconds%60;
+    private String millisToTextTime(int millis) {
+        int seconds = millis / 1000;
+        int quotient = seconds / 60;
+        int remainder = seconds % 60;
 
-        String sS=String.valueOf(shang);
-        String yS=String.valueOf(yushu);
-        if(sS.length()==1)sS="0"+sS;
-        if(yS.length()==1)yS="0"+yS;
+        String sS = String.valueOf(quotient);
+        String yS = String.valueOf(remainder);
+        if (sS.length() == 1) sS = "0" + sS;
+        if (yS.length() == 1) yS = "0" + yS;
 
 
-        return sS+":"+yS;
+        return sS + ":" + yS;
     }
 }

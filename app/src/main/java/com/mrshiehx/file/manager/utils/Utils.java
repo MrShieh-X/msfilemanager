@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.mrshiehx.file.manager.R;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
+import com.topjohnwu.superuser.Shell;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,14 +25,14 @@ public class Utils {
 
     public static void sendMail(Context context, String receiver, String subject, String text) {
         Intent data = new Intent(Intent.ACTION_SENDTO);
-        data.setData(Uri.parse("mailto:"+receiver+"?subject="+subject+"&body="+text));
+        data.setData(Uri.parse("mailto:" + receiver + "?subject=" + subject + "&body=" + text));
         //data.putExtra(Intent.EXTRA_EMAIL,receiver);
         //data.putExtra("subject", subject);
         //data.putExtra("text", text);
         //data.putExtra("body", text);
         try {
             context.startActivity(data);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(context, context.getText(R.string.message_no_mail_app), Toast.LENGTH_SHORT).show();
         }
@@ -50,9 +53,9 @@ public class Utils {
     }*/
 
 
-    public static PackageInfo getPackageInfo(Context context,String apkPath) {
+    public static PackageInfo getPackageInfo(Context context, String apkPath) {
         PackageManager pm = context.getPackageManager();
-        PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath,PackageManager.GET_ACTIVITIES);
+        PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
         /*if (pkgInfo != null) {
             ApplicationInfo appInfo = pkgInfo.applicationInfo;
             *//* 必须加这两句，不然下面icon获取是default icon而不是应用包的icon *//*
@@ -105,11 +108,24 @@ public class Utils {
         return sbResult.toString();
     }
 
-    public static void startActivityWithFilePath(Context context, Class<?> clazz, String filePath){
-        Intent intent=new Intent();
+
+    public static String bytesToString(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte aByte : bytes) {
+            builder.append(String.format("%02X", aByte));
+        }
+        return builder.toString().toUpperCase();
+    }
+
+    public static void startActivityWithAFI(Context context, Class<?> clazz, AbstractFileItem afi) {
+        Intent intent = new Intent();
         intent.setClass(context, clazz);
-        intent.putExtra("filePath",filePath);
-        intent.putExtra("backButton",true);
+        intent.putExtra("afi", afi);
+        intent.putExtra("backButton", true);
         context.startActivity(intent);
+    }
+
+    public static boolean isRootFileWithDeviceStatus(File dir) {
+        return (!dir.canRead() || !dir.canWrite()) && SharedPreferencesGetter.getGetRoot() && Shell.rootAccess();
     }
 }

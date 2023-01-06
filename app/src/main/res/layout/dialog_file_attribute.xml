@@ -1,104 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/file_attribute_name_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_name"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:clickable="true"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_type_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_type"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_directory_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_directory"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_directory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_path_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_path"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/file_attribute_date_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_date"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_size_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_size"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_folders_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_folders"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_folders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_files_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_files"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_files"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/file_attribute_linkto_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="3"
+            android:text="@string/dialog_file_attribute_linkto"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView" />
+
+        <TextView
+            android:id="@+id/file_attribute_linkto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="2"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginEnd="30dp"
         android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_name"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_type"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_directory"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_path"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_date"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_size"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_folders"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_marginLeft="30dp"
-        android:textIsSelectable="true"
-        android:id="@+id/file_attribute_files"/>
-
+        android:layout_gravity="end"
+        android:id="@+id/loading"
+        android:visibility="gone" />
 </LinearLayout>

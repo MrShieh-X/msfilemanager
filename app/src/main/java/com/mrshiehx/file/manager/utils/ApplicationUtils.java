@@ -10,7 +10,7 @@ import com.mrshiehx.file.manager.application.MSFMApplication;
 
 public class ApplicationUtils {
     public static int getVersionCode() {
-        Context context=MSFMApplication.getContext();
+        Context context = MSFMApplication.getContext();
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), 0);
@@ -22,7 +22,7 @@ public class ApplicationUtils {
     }
 
     public static String getVersionName() {
-        Context context=MSFMApplication.getContext();
+        Context context = MSFMApplication.getContext();
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), 0);
@@ -33,18 +33,18 @@ public class ApplicationUtils {
         return null;
     }
 
-    public static AlertDialog showDialog(Context context, CharSequence title, CharSequence message, CharSequence positiveButtonText, CharSequence negativeButtonText, CharSequence neutralButtonText, DialogInterface.OnClickListener positiveButtonOnClickListener, DialogInterface.OnClickListener negativeButtonOnClickListener, DialogInterface.OnClickListener neutralButtonOnClickListener, boolean cancelable){
-        AlertDialog.Builder dialog=new AlertDialog.Builder(context);
-        if(null!=title)
+    public static AlertDialog showDialog(Context context, CharSequence title, CharSequence message, CharSequence positiveButtonText, CharSequence negativeButtonText, CharSequence neutralButtonText, DialogInterface.OnClickListener positiveButtonOnClickListener, DialogInterface.OnClickListener negativeButtonOnClickListener, DialogInterface.OnClickListener neutralButtonOnClickListener, boolean cancelable) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        if (null != title)
             dialog.setTitle(title);
-        if(null!=message)
+        if (null != message)
             dialog.setMessage(message);
-        if(null!=positiveButtonText)
-            dialog.setPositiveButton(positiveButtonText,positiveButtonOnClickListener);
-        if(null!=negativeButtonText)
-            dialog.setNegativeButton(negativeButtonText,negativeButtonOnClickListener);
-        if(null!=neutralButtonText)
-            dialog.setNeutralButton(neutralButtonText,neutralButtonOnClickListener);
+        if (null != positiveButtonText)
+            dialog.setPositiveButton(positiveButtonText, positiveButtonOnClickListener);
+        if (null != negativeButtonText)
+            dialog.setNegativeButton(negativeButtonText, negativeButtonOnClickListener);
+        if (null != neutralButtonText)
+            dialog.setNeutralButton(neutralButtonText, neutralButtonOnClickListener);
         dialog.setCancelable(cancelable);
         return dialog.show();
     }

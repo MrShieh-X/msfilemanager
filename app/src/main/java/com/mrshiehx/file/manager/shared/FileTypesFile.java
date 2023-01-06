@@ -7,13 +7,14 @@ import org.json.JSONObject;
 
 public class FileTypesFile {
     public static JSONObject fileTypesJsonObject;
-    public static JSONObject getJSONObject(){
-        if(fileTypesJsonObject==null) {
+
+    public static JSONObject getJSONObject() {
+        if (fileTypesJsonObject == null) {
             try {
                 fileTypesJsonObject = new JSONObject(FileUtils.getString(MSFMApplication.getContext().getAssets().open("fileTypes.json")));
             } catch (Exception e) {
                 e.printStackTrace();
-                fileTypesJsonObject=new JSONObject();
+                fileTypesJsonObject = new JSONObject();
             }
         }
         return fileTypesJsonObject;

@@ -398,11 +398,11 @@ public class ProfessionalImageView extends AppCompatImageView implements ViewTre
         float drowScale/* = 1.0f*/;
         float scale = getScale();
 
-        float maxHere=mMaxScale-((mMaxScale/5)*2);
-        if(scale==mInitScale){
-            drowScale=maxHere;
-        }else {
-            drowScale=mInitScale;
+        float maxHere = mMaxScale - ((mMaxScale / 5) * 2);
+        if (scale == mInitScale) {
+            drowScale = maxHere;
+        } else {
+            drowScale = mInitScale;
         }
 
 

@@ -14,29 +14,30 @@ import com.mrshiehx.file.manager.application.MSFMApplication;
 import java.util.Locale;
 
 public class ResourceUtils {
-    public static Drawable getDrawable(@DrawableRes int id){
+    public static Drawable getDrawable(@DrawableRes int id) {
         return MSFMApplication.getContext().getResources().getDrawable(id);
     }
 
-    public static String getString(@StringRes int id){
+    public static String getString(@StringRes int id) {
         return MSFMApplication.getContext().getResources().getString(id);
     }
 
-    public static CharSequence getText(@StringRes int id){
+    public static CharSequence getText(@StringRes int id) {
         return MSFMApplication.getContext().getResources().getText(id);
     }
 
-    public static CharSequence getTextByLocale(@StringRes int idRes){
-        String language=MSFMApplication.getSharedPreferences().getString("language","auto");
-        String[]languageAndCountry2=new String[]{"en","US"};
-        if(language.equals("auto")){
-            languageAndCountry2=new String[]{Locale.getDefault().getLanguage(),Locale.getDefault().getCountry().toUpperCase()};
-        }else{
-            try{
-                languageAndCountry2=language.split("_");
-            }catch (Throwable ignored){}
+    public static CharSequence getTextByLocale(@StringRes int idRes) {
+        String language = MSFMApplication.getSharedPreferences().getString("language", "auto");
+        String[] languageAndCountry2 = new String[]{"en", "US"};
+        if (language.equals("auto")) {
+            languageAndCountry2 = new String[]{Locale.getDefault().getLanguage(), Locale.getDefault().getCountry().toUpperCase()};
+        } else {
+            try {
+                languageAndCountry2 = language.split("_");
+            } catch (Throwable ignored) {
+            }
         }
-        return getTextByLocale(idRes,languageAndCountry2[0],languageAndCountry2[1]);
+        return getTextByLocale(idRes, languageAndCountry2[0], languageAndCountry2[1]);
     }
 
     public static CharSequence getTextByLocale(@StringRes int stringId, String language, String country) {

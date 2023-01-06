@@ -9,5 +9,10 @@
   "flac": "audio",
   "json": "text",
   "java": "text",
-  "xml": "text"
+  "xml": "text",
+  "c": "text",
+  "cpp": "text",
+  "prop": "text",
+  "h": "text",
+  "hpp": "text"
 }

@@ -2,8 +2,8 @@ package com.mrshiehx.file.manager.file.openers;
 
 import android.content.Context;
 
-import java.io.File;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
 
 public interface FileOpener {
-    void open(Context context, File file);
+    void open(Context context, AbstractFileItem file);
 }

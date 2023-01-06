@@ -26,35 +26,36 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract void init();
 
-    public static SharedPreferences getSharedPreferences(){
+    public static SharedPreferences getSharedPreferences() {
         return MSFMApplication.getSharedPreferences();
     }
 
-    public static void init(Context context){
-        MSFMApplication.getInstance().addActivity((Activity) context);
-        SharedPreferences sharedPreferences=getSharedPreferences();
-        if(context instanceof FileManagerActivity) {
-            initTheme(context, R.style.Theme_MSFileManager_Dark_NoActionBar, R.style.Theme_MSFileManager_NoActionBar);
-        }else{
-            initTheme(context, R.style.Theme_MSFileManager_Dark,R.style.Theme_MSFileManager);
+    public static void init(Activity activity) {
+        MSFMApplication.getInstance().addActivity(activity);
+        SharedPreferences sharedPreferences = getSharedPreferences();
+        if (activity instanceof FileManagerActivity) {
+            initTheme(activity, R.style.Theme_MSFileManager_Dark_NoActionBar, R.style.Theme_MSFileManager_NoActionBar);
+        } else {
+            initTheme(activity, R.style.Theme_MSFileManager_Dark, R.style.Theme_MSFileManager);
         }
-        String language=sharedPreferences.getString("language","auto");
-        String[]languageAndCountry2=new String[]{"en","US"};
-        if(language.equals("auto")){
-            languageAndCountry2=new String[]{Locale.getDefault().getLanguage(),Locale.getDefault().getCountry().toUpperCase()};
-        }else{
-            try{
-                languageAndCountry2=language.split("_");
-            }catch (Throwable ignored){}
+        String language = sharedPreferences.getString("language", "auto");
+        String[] languageAndCountry2 = new String[]{"en", "US"};
+        if (language.equals("auto")) {
+            languageAndCountry2 = new String[]{Locale.getDefault().getLanguage(), Locale.getDefault().getCountry().toUpperCase()};
+        } else {
+            try {
+                languageAndCountry2 = language.split("_");
+            } catch (Throwable ignored) {
+            }
         }
-        SystemUtils.setLanguage(context,languageAndCountry2[0],languageAndCountry2[1]);
+        SystemUtils.setLanguage(activity, languageAndCountry2[0], languageAndCountry2[1]);
     }
 
-    public static void initTheme(Context context, @StyleRes int dark, @StyleRes int notDark){
-        boolean darkTheme=getSharedPreferences().getBoolean("darkTheme",false);
-        if(darkTheme){
+    public static void initTheme(Context context, @StyleRes int dark, @StyleRes int notDark) {
+        boolean darkTheme = getSharedPreferences().getBoolean("darkTheme", false);
+        if (darkTheme) {
             context.setTheme(dark);
-        }else{
+        } else {
             context.setTheme(notDark);
         }
     }

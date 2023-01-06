@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/preference_settings_category_appearance_title">
-    <CheckBoxPreference
-        android:key="darkTheme"
-        android:title="@string/preference_settings_dark_theme_title" />
-    <ListPreference
-        android:entries="@array/preference_settings_languages"
-        android:entryValues="@array/preference_settings_languages_values"
-        android:defaultValue="auto"
-        android:key="language"
-        android:title="@string/preference_settings_language_title" />
+        <CheckBoxPreference
+            android:key="darkTheme"
+            android:title="@string/preference_settings_dark_theme_title" />
+        <ListPreference
+            android:entries="@array/preference_settings_languages"
+            android:entryValues="@array/preference_settings_languages_values"
+            android:defaultValue="auto"
+            android:key="language"
+            android:title="@string/preference_settings_language_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preference_settings_category_list_files_title">
         <CheckBoxPreference
@@ -24,8 +24,7 @@
             android:title="@string/preference_settings_startup_dir_title" />
         <EditTextPreference
             android:key="home"
-            android:title="@string/preference_settings_home_title"
-            android:defaultValue="/storage/emulated/0"/>
+            android:title="@string/preference_settings_home_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preference_settings_category_advance_title">
         <CheckBoxPreference
@@ -36,18 +35,18 @@
     <PreferenceCategory android:title="@string/preference_settings_about_title">
         <Preference
             android:key="about_application"
-            android:summary="@string/preference_settings_about_application_summary"/>
+            android:summary="@string/preference_settings_about_application_summary" />
         <Preference
             android:title="@string/preference_settings_author_title"
             android:key="author" />
         <Preference
             android:title="@string/preference_settings_email_title"
-            android:key="about_email"/>
+            android:key="about_email" />
         <Preference
             android:title="@string/preference_settings_author_github_title"
-            android:key="about_github"/>
+            android:key="about_github" />
         <Preference
             android:title="@string/preference_settings_open_source_title"
-            android:key="about_open_source"/>
+            android:key="about_open_source" />
     </PreferenceCategory>
 </PreferenceScreen>

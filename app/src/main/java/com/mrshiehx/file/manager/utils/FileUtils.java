@@ -35,12 +35,12 @@ public class FileUtils {
     public static String getFormatSize(double size) {
         double kiloByte = size / 1024;
 
-        if (size==0) {
+        if (size == 0) {
             //return size + "B";
             return "0.00MB";
         }
         if (kiloByte < 1) {
-            return (int)size + "B";
+            return (int) size + "B";
             //return "0.00MB";
         }
 
@@ -174,7 +174,7 @@ public class FileUtils {
     }
 
     public static byte[] toByteArray(File file) throws IOException {
-        FileChannel fc=new RandomAccessFile(file, "r").getChannel();
+        FileChannel fc = new RandomAccessFile(file, "r").getChannel();
         MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.READ_ONLY, 0,
                 fc.size()).load();
         //System.out.println(byteBuffer.isLoaded());
@@ -186,5 +186,4 @@ public class FileUtils {
         fc.close();
         return result;
     }
-
 }

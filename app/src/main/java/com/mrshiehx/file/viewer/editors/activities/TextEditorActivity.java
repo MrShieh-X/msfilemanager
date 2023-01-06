@@ -12,20 +12,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 
 import com.mrshiehx.file.manager.R;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
 import com.mrshiehx.file.manager.utils.ApplicationUtils;
-import com.mrshiehx.file.manager.utils.FileUtils;
 import com.mrshiehx.file.manager.utils.Utils;
 import com.mrshiehx.file.viewer.activities.base.BaseViewerActivity;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class TextEditorActivity extends BaseViewerActivity {
-    protected Context context=TextEditorActivity.this;
+    protected Context context = TextEditorActivity.this;
     private EditText editText;
-    private boolean modified=false;
-    private boolean firstModify=true;
+    private boolean modified = false;
+    private boolean firstModify = true;
+
     @Override
     protected void init() {
         initViews();
@@ -33,7 +32,7 @@ public class TextEditorActivity extends BaseViewerActivity {
         super.init();
     }
 
-    private void initListeners(){
+    private void initListeners() {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -46,43 +45,43 @@ public class TextEditorActivity extends BaseViewerActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(!firstModify){
-                    modified=true;
+                if (!firstModify) {
+                    modified = true;
                     makeTitleBeModified();
                 }
-                firstModify=false;
+                firstModify = false;
             }
         });
     }
 
-    protected void loadData(File file)throws IOException,OutOfMemoryError{
-        editText.setText(new String(FileUtils.toByteArray(file)));
+    protected void loadData(AbstractFileItem file) throws IOException, OutOfMemoryError {
+        editText.setText(file.getFileContent());
     }
 
-    private void initViews(){
+    private void initViews() {
         setContentView(R.layout.activity_text_editor);
-        editText=findViewById(R.id.text_editor_edittext);
+        editText = findViewById(R.id.text_editor_edittext);
     }
 
-    private void makeTitleBeModified(){
-        ActionBar actionBar=getSupportActionBar();
-        if(actionBar!=null){
-            CharSequence charSequence=actionBar.getSubtitle();
-            if(!Utils.isEmpty(charSequence)) {
-                if (!charSequence.toString().endsWith("*")){
-                    actionBar.setSubtitle(charSequence+" *");
+    private void makeTitleBeModified() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            CharSequence charSequence = actionBar.getSubtitle();
+            if (!Utils.isEmpty(charSequence)) {
+                if (!charSequence.toString().endsWith("*")) {
+                    actionBar.setSubtitle(charSequence + " *");
                 }
             }
         }
     }
 
-    private void removeTitleStar(){
-        ActionBar actionBar=getSupportActionBar();
-        if(actionBar!=null){
-            CharSequence charSequence=actionBar.getSubtitle();
-            if(!Utils.isEmpty(charSequence)) {
-                if (charSequence.toString().endsWith(" *")){
-                    actionBar.setSubtitle(charSequence.subSequence(0,charSequence.length()-2));
+    private void removeTitleStar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            CharSequence charSequence = actionBar.getSubtitle();
+            if (!Utils.isEmpty(charSequence)) {
+                if (charSequence.toString().endsWith(" *")) {
+                    actionBar.setSubtitle(charSequence.subSequence(0, charSequence.length() - 2));
                 }
             }
         }
@@ -93,42 +92,39 @@ public class TextEditorActivity extends BaseViewerActivity {
         getMenuInflater().inflate(R.menu.menu_text_editor, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.action_text_editor_save:
-                saveFile();
-                break;
+        if (id == R.id.action_text_editor_save) {
+            saveFile();
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void backNoFinish(){
-        if(!modified) {
+    protected void backNoFinish() {
+        if (!modified) {
             finish();
-        }else{
-            ApplicationUtils.showDialog(context, getText(R.string.dialog_title_notice), String.format(getString(R.string.dialog_text_editor_file_modified_back_message), file.getName()), getText(R.string.action_save_name),getText(android.R.string.no),getText(R.string.action_back_name), new DialogInterface.OnClickListener() {
+        } else {
+            ApplicationUtils.showDialog(context, getText(R.string.dialog_title_notice), String.format(getString(R.string.dialog_text_editor_file_modified_back_message), afi.getName()), getText(R.string.action_save_name), getText(android.R.string.no), getText(R.string.action_back_name), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     saveFile();
                     finish();
                 }
-            },null, (dialog, which) -> finish(), true);
+            }, null, (dialog, which) -> finish(), true);
         }
     }
 
-    private void saveFile(){
-        if (file != null) {
+    private void saveFile() {
+        if (afi != null) {
             try {
-                if (!file.exists()) file.createNewFile();
-                FileWriter writer = new FileWriter(file, false);
-                writer.write(editText.getText().toString());
-                writer.flush();
-                writer.close();
+                if (!afi.exists())
+                    afi.createNewFile();
+                afi.modifyAllBytes(editText.getText().toString());
                 Toast.makeText(context, getString(R.string.message_success_save), Toast.LENGTH_SHORT).show();
-                modified=false;
+                modified = false;
                 removeTitleStar();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -141,7 +137,7 @@ public class TextEditorActivity extends BaseViewerActivity {
 
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
-        menu.findItem(R.id.action_text_editor_save).setEnabled(file!=null&&modified);
+        menu.findItem(R.id.action_text_editor_save).setEnabled(afi != null && modified);
         return super.onMenuOpened(featureId, menu);
     }
 }

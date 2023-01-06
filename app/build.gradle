@@ -3,15 +3,16 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
+    ndkVersion = "25.1.8937393"
 
     defaultConfig {
         applicationId "com.mrshiehx.file.manager"
         minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 5
-        versionName "1.1.2"
+        targetSdkVersion 33
+        versionCode 6
+        versionName "1.2"
         archivesBaseName = "msfm_${versionName}".replace(' ', '_')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,9 +27,24 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    externalNativeBuild {
+        cmake {
+            path file('src/main/jni/CMakeLists.txt')
+            version '3.18.1'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.github.clans:fab:1.6.4'
+    implementation "com.github.topjohnwu.libsu:core:3.2.1"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }

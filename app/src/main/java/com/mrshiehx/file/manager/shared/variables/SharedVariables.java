@@ -22,7 +22,7 @@ public class SharedVariables {
                 FileViewer.MORE_ALL_TYPES};
     }
 
-    public static String getFileProviderPackageName(){
+    public static String getFileProviderPackageName() {
         return "com.mrshiehx.file.manager.FileProvider";
     }
 }

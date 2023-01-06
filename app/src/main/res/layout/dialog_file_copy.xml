@@ -1,122 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/dialog_file_copy_current"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:text="@string/dialog_file_copy_current" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/dialog_copy_current"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:id="@+id/dialog_copy_current" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/dialog_file_copy_source"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:text="@string/dialog_file_copy_source" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/dialog_copy_source"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:id="@+id/dialog_copy_source" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
             android:text="@string/dialog_file_copy_to"
-            android:id="@+id/dialog_copy_to_text"/>
+            android:id="@+id/dialog_copy_to_text" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/dialog_copy_to"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:id="@+id/dialog_copy_to" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/dialog_file_copy_remaining"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:text="@string/dialog_file_copy_remaining" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/dialog_copy_remaining"/>
+            android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+            android:id="@+id/dialog_copy_remaining" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp">
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="15dp">
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:layout_gravity="start"
-            android:textAppearance="?android:attr/textAppearanceMedium">
+            android:layout_gravity="start">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView"
                 android:id="@+id/dialog_copy_percentage"
-                android:text="0"/>
+                android:text="0" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="%"/>
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+                android:text="%" />
         </LinearLayout>
 
         <LinearLayout
@@ -124,23 +134,26 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:gravity="end">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView"
                 android:id="@+id/dialog_copy_processed"
-                android:text="0"/>
+                android:text="0" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="/"/>
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView"
+                android:text="/" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView"
                 android:id="@+id/dialog_copy_total"
-                android:text="0"/>
+                android:text="0" />
         </LinearLayout>
     </LinearLayout>
 
@@ -154,5 +167,5 @@
         android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
         style="?android:attr/progressBarStyleHorizontal"
-        android:id="@+id/dialog_copy_progress"/>
+        android:id="@+id/dialog_copy_progress" />
 </LinearLayout>

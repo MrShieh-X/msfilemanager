@@ -10,7 +10,7 @@ Anyone can take advices of this application to us.
 
 ## Version
 The latest version: <br/>
-<b>1.1.2 (Jan. 22, 2022)</b><br/>
+<b>1.2 (Jan. 6, 2023)</b><br/>
 Historical version: <br/>
 <b>1.1.2 (Jan. 22, 2022)</b><br/>
 <b>1.1.1 (Aug. 27, 2021)</b><br/>
@@ -26,10 +26,15 @@ You can set the language in the settings.
 - English (United States)
 - Simplified Chinese (China)
 
-## Found BUGs
-- Browsing directories with many large picture files will get stuck.
-- Unable to access the root directory.
-- A problem arises when the target file already exists when moving files.
+## Found BUGs and Functions to be Improved
+- Errors may occur when reading files that require ROOT access to access, which may cause errors in the checksum function of these files.
+- Lower versions of Android may not be able to modify the file date.
+- Lower versions of Android may not be able to move files from normal directories to ROOT directories.
+- When moving a file, the operation will fail if the target file already exists.
+- Certain folder links may be treated as file links.
+- Limited operations on ROOT files.
+- (Optimized in v1.2)~~Browsing directories with many large picture files will get stuck.~~
+- (Supported in v1.2)~~Unable to access the root directory.~~
 
 ## About Author
 MrShiehX<br/>

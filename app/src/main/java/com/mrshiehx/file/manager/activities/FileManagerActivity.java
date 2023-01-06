@@ -1,30 +1,41 @@
 package com.mrshiehx.file.manager.activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -32,137 +43,126 @@ import com.mrshiehx.file.manager.R;
 import com.mrshiehx.file.manager.activities.base.BaseActivity;
 import com.mrshiehx.file.manager.adapters.FilesAdapter;
 import com.mrshiehx.file.manager.application.MSFMApplication;
-import com.mrshiehx.file.manager.beans.FileItem;
 import com.mrshiehx.file.manager.beans.Permission;
+import com.mrshiehx.file.manager.beans.fileItem.AbstractFileItem;
+import com.mrshiehx.file.manager.beans.fileItem.FileItem;
+import com.mrshiehx.file.manager.beans.fileItem.RootFileItem;
 import com.mrshiehx.file.manager.enums.SortMethod;
 import com.mrshiehx.file.manager.file.operations.AfterGoToDialog;
 import com.mrshiehx.file.manager.file.operations.FileOperations;
 import com.mrshiehx.file.manager.file.operations.FileOperationsDialogs;
-import com.mrshiehx.file.manager.interfaces.Void;
-import com.mrshiehx.file.manager.shared.variables.Commands;
 import com.mrshiehx.file.manager.shared.variables.FilePaths;
 import com.mrshiehx.file.manager.shared.variables.SharedVariables;
+import com.mrshiehx.file.manager.utils.BytesUtils;
+import com.mrshiehx.file.manager.utils.PathUtils;
 import com.mrshiehx.file.manager.utils.SharedPreferencesGetter;
+import com.mrshiehx.file.manager.utils.ShellUtils;
+import com.mrshiehx.file.manager.utils.StatParser;
 import com.mrshiehx.file.manager.utils.SystemUtils;
 import com.mrshiehx.file.manager.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class FileManagerActivity extends BaseActivity {
-    protected Context context= FileManagerActivity.this;
+    protected Context context = FileManagerActivity.this;
+    protected Activity activity = FileManagerActivity.this;
     private ListView filesListView;
     private FloatingActionButton createFolder;
     private FloatingActionButton createFile;
     private FloatingActionMenu fab_buttons;
     private Toolbar toolbar;
     private TextView title;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ImageButton warning;
 
     private File currentFile;
     private SortMethod sortMethod;
     private int sortMethodNumber;
-    private Map<File,String> position;
-    private File copingFile;
-    private File movingFile;
+    private Map<File, String> position;
+    private AbstractFileItem copingFile;
+    private AbstractFileItem movingFile;
+    private int accessMode;//0为一般情况，1为使用Shell.su，0为不能进行任何操作
+    private final Map<File, Boolean> interrupts = new HashMap<>();
+    //private Thread copyingThread;
 
     boolean ps;
     long firstTime;
-    
-    private final int REQUEST_CODE_GET_PERMISSION=100;
-    private final int REQUEST_CODE_GO_TO_SETTINGS=1000;
+
+    private final int REQUEST_CODE_GET_PERMISSION = 100;
+    private final int REQUEST_CODE_GO_TO_SETTINGS = 1000;
     //private final int FILE_ACTION_OPEN_NUMBER=0;
-    private final int FILE_ACTION_CHOOSE_OPEN_METHOD_NUMBER=0;
-    private final int FILE_ACTION_RENAME_NUMBER=1;
-    private final int FILE_ACTION_COPY_NUMBER=2;
-    private final int FILE_ACTION_MOVE_NUMBER=3;
-    private final int FILE_ACTION_DELETE_NUMBER=4;
-    private final int FILE_ACTION_ATTRIBUTES_NUMBER=5;
+    private final int FILE_ACTION_CHOOSE_OPEN_METHOD_NUMBER = 0;
+    private final int FILE_ACTION_RENAME_NUMBER = 1;
+    private final int FILE_ACTION_COPY_NUMBER = 2;
+    private final int FILE_ACTION_MOVE_NUMBER = 3;
+    private final int FILE_ACTION_DELETE_NUMBER = 4;
+    private final int FILE_ACTION_CHECKSUM_NUMBER = 5;
+    private final int FILE_ACTION_ATTRIBUTES_NUMBER = 6;
 
     AlertDialog.Builder dialog_no_permissions;
     AlertDialog dialog_no_permissions_dialog;
 
-    protected Runtime runtime;
-    protected void init(){
+    protected void init() {
         setContentView(R.layout.activity_file_manager);
+
+        //必须在initCurrentFile()之前
+        SharedPreferences sharedPreferences = MSFMApplication.getSharedPreferences();
+        if (sharedPreferences.getString("home", "").isEmpty()) {
+            sharedPreferences.edit().putString("home", FilePaths.getSdcard().getAbsolutePath()).apply();
+        }
+
         initVariables();
         initViews();
-        initSortMethod();
+        sortMethod = SortMethod.valuesOf(SharedPreferencesGetter.getSortMethod(), SortMethod.BY_NAME);
         initCurrentFile();
         initListeners();
-        getPermission(new Permission(SharedVariables.getPermissions()[0]));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            getPermission(new Permission(SharedVariables.getPermissions()[0]));
+        }
         setTitle(currentFile.getAbsolutePath());
-        getRoot();
     }
 
-    void initVariables(){
-        runtime=Runtime.getRuntime();
-        position=new HashMap<>();
-/*
-        try {
-            runtime.exec("su");
-            //runtime.exec("cd /");
-            String result="";
-            Process a= runtime.exec("ls /data");
-            InputStream is = a.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader mReader = new BufferedReader(isr);
-            String string;
-            while ((string = mReader.readLine()) != null) {
-                result = result + string + "\n";
-            }
-            new AlertDialog.Builder(context).setMessage(result).show();
-        }catch (Exception e){
-            e.printStackTrace();
-        }*/
+    void initVariables() {
+        position = new HashMap<>();
     }
 
-    void getRoot(){
-        if(SharedPreferencesGetter.getGetRoot()){
-            try {
-                runtime.exec(Commands.getSuperUserCommand().getArguments()[0]);
-                initFiles(currentFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(context, getText(R.string.message_failed_to_get_root), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    void initSortMethod(){
-        sortMethod=SortMethod.BY_NAME;
-        if(SharedPreferencesGetter.getSortMethod().equals(SortMethod.BY_DATE.getName())){
-            sortMethod=SortMethod.BY_DATE;
-        }
-    }
-
-    void initCurrentFile(){
-        SharedPreferences sharedPreferences=getSharedPreferences();
-        String home=sharedPreferences.getString("home", FilePaths.getSdcard().getAbsolutePath());
-        if(sharedPreferences.getString("startupDir","home").equals("last")) {
+    void initCurrentFile() {
+        SharedPreferences sharedPreferences = getSharedPreferences();
+        String home = sharedPreferences.getString("home", FilePaths.getSdcard().getAbsolutePath());
+        if (sharedPreferences.getString("startupDir", "home").equals("last")) {
             currentFile = new File(sharedPreferences.getString("lastPath", home));
-        }else{
-            currentFile=new File(home);
+        } else {
+            currentFile = new File(home);
         }
         setTitle(currentFile.getAbsolutePath());
     }
 
-    void initViews(){
-        filesListView=findViewById(R.id.files);
-        createFolder=findViewById(R.id.create_folder);
-        createFile=findViewById(R.id.create_file);
-        toolbar=findViewById(R.id.toolbar);
-        title=findViewById(R.id.title);
-        fab_buttons=findViewById(R.id.fab_buttons);
+    void initViews() {
+        filesListView = findViewById(R.id.files);
+        createFolder = findViewById(R.id.create_folder);
+        createFile = findViewById(R.id.create_file);
+        toolbar = findViewById(R.id.toolbar);
+        title = findViewById(R.id.title);
+        fab_buttons = findViewById(R.id.fab_buttons);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        warning = findViewById(R.id.warning);
 
         super.setTitle("");
+
+        toolbar.setBackgroundColor(getSharedPreferences().getBoolean("darkTheme", false) ? getResources().getColor(R.color.colorPrimary) : getResources().getColor(R.color.colorPrimaryLight));
         setSupportActionBar(toolbar);
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            position.remove(currentFile);
+            initFiles(currentFile);
+        });
 
         filesListView.setDividerHeight(0);
 
@@ -172,7 +172,7 @@ public class FileManagerActivity extends BaseActivity {
                 // TODO Auto-generated method stub
                 ListAdapter listAdapter = view.getAdapter();
                 if (listAdapter instanceof FilesAdapter) {
-                    FilesAdapter adapter=(FilesAdapter)listAdapter;
+                    FilesAdapter adapter = (FilesAdapter) listAdapter;
                     switch (scrollState) {
                         case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止  0
                             adapter.scrollStatus = 0;
@@ -200,183 +200,155 @@ public class FileManagerActivity extends BaseActivity {
         });
     }
 
-    void initFiles(File fileF) {
-        List<FileItem> folders = new ArrayList<>();
-        List<FileItem> files = new ArrayList<>();
-        if (!fileF.getAbsolutePath().equals(FilePaths.getRootPath())) {
-            FileItem backer = new FileItem(new File(".."));
-            backer.setIsBacker(true);
-            folders.add(backer);
-        }
-        boolean showHiddenFiles = getSharedPreferences().getBoolean("showHiddenFiles", false);
-        String sort = SharedPreferencesGetter.getSortMethod();
-        String[] listArray = fileF.list();
+    void initFiles(File dir) {
+        interrupts.put(currentFile, true);
+        currentFile = dir;
+        interrupts.remove(dir);
+        new Thread(() -> {
+            List<AbstractFileItem> folders = new LinkedList<>();
+            List<AbstractFileItem> files = new LinkedList<>();
+            boolean showHiddenFiles = getSharedPreferences().getBoolean("showHiddenFiles", false);
+            SortMethod sort = SortMethod.valuesOf(SharedPreferencesGetter.getSortMethod(), SortMethod.BY_NAME);
+            boolean getRoot = SharedPreferencesGetter.getGetRoot();
 
-        if (listArray != null) {
-            if (sort.equals(SortMethod.BY_DATE.getName())) {
-                Map<File, Long> foldersMap = new HashMap<>();
-                Map<File, Long> filesMap = new HashMap<>();
-                try {
-                    for (String s : listArray) {
-                        File file = new File(fileF, s);
-
-                        if (file.getName().startsWith(".")) {
-                            if (showHiddenFiles) {
-                                if (file.isFile()) {
-                                    filesMap.put(file, file.lastModified());
-                                } else {
-                                    foldersMap.put(file, file.lastModified());
-                                }
-                            }
-                        } else {
-                            if (file.isFile()) {
-                                filesMap.put(file, file.lastModified());
-                            } else {
-                                foldersMap.put(file, file.lastModified());
-                            }
-                        }
-                    }
-
-                    /**这是反的*/
-
-                    List<Map.Entry<File, Long>> entryList1 = new ArrayList<>(foldersMap.entrySet());
-                    Collections.sort(entryList1, new Comparator<Map.Entry<File, Long>>() {
-                        @Override
-                        public int compare(Map.Entry<File, Long> e1, Map.Entry<File, Long> e2) {
-                            int re = e2.getValue().compareTo(e1.getValue());
-                            if (re != 0) {
-                                return re;
-                            } else {
-                                return e2.getKey().compareTo(e1.getKey());
-                            }
-                        }
-                    });
-
-
-                    List<Map.Entry<File, Long>> entryList2 = new ArrayList<>(filesMap.entrySet());
-                    Collections.sort(entryList2, new Comparator<Map.Entry<File, Long>>() {
-                        @Override
-                        public int compare(Map.Entry<File, Long> e1, Map.Entry<File, Long> e2) {
-                            int re = e2.getValue().compareTo(e1.getValue());
-                            if (re != 0) {
-                                return re;
-                            } else {
-                                return e2.getKey().compareTo(e1.getKey());
-                            }
-                        }
-                    });
-
-                    List<File> foldersFinal = new ArrayList<>();
-                    List<File> filesFinal = new ArrayList<>();
-
-                    /**顺序调转*/
-                    for (int i = 0; i < entryList1.size(); i++) {
-                        foldersFinal.add(entryList1.get(entryList1.size() - 1 - i).getKey());
-                    }
-                    for (int i = 0; i < entryList2.size(); i++) {
-                        filesFinal.add(entryList2.get(entryList2.size() - 1 - i).getKey());
-                    }
-
-                    /*List<Map.Entry<File,Long>> entryList2 = new ArrayList<>(filesMap.entrySet());
-                    Collections.sort(entryList2, new Comparator<Map.Entry<File,Long>>() {
-                        @Override
-                        public int compare(Map.Entry<File,Long> me1, Map.Entry<File,Long> me2) {
-                            return me1.getValue().compareTo(me2.getValue());
-                        }
-                    });*/
-
-                    foldersFinal.addAll(filesFinal);
-                    for (int i = 0; i < foldersFinal.size(); i++) {
-                        folders.add(new FileItem(foldersFinal.get(i)));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, R.string.message_failed_to_list_files, Toast.LENGTH_SHORT).show();
-                    new AlertDialog.Builder(context)
-                            .setTitle(R.string.message_failed_to_list_files)
-                            .setMessage(e.toString())
-                            .show();
+            //开始分情况
+            if (dir.canRead() && dir.canWrite()) {
+                accessMode = 0;
+            } else if (dir.canRead() && !dir.canWrite()) {
+                if (getRoot && Shell.rootAccess()) {
+                    accessMode = 1;
+                } else {
+                    accessMode = 0;
                 }
-            } else {
-                try {
-                    List<String> list = Arrays.asList(listArray);
-                    Collections.sort(list, String::compareToIgnoreCase);
-                    for (String path : list) {
-                        File file = new File(fileF, path);
-                        if (file.getName().startsWith(".")) {
-                            if (showHiddenFiles) {
-                                if (file.isDirectory()) {
-                                    folders.add(new FileItem(file));
-                                } else {
-                                    files.add(new FileItem(file));
+            } else /*if ((!dir.canRead() && !dir.canWrite())||(!dir.canRead() && dir.canWrite())) */ {
+                if (getRoot && Shell.rootAccess()) {
+                    accessMode = 1;
+                } else {
+                    accessMode = 2;
+                    runOnUiThread(() -> {
+                        warning.setVisibility(View.VISIBLE);
+                        warning.setOnClickListener((v) -> {
+                            String sdcard = FilePaths.getSdcard().getAbsolutePath();
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                            dialog.setTitle(R.string.dialog_title_notice);
+                            dialog.setMessage(String.format(getString(R.string.dialog_higher_version_os_unaccessable_root_directory_message), sdcard));
+                            dialog.setPositiveButton(R.string.dialog_higher_version_os_unaccessable_root_directory_goto_sdcard, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    goToFile(sdcard);
                                 }
-                            }
-                        } else {
-                            if (file.isDirectory()) {
-                                folders.add(new FileItem(file));
-                            } else {
-                                files.add(new FileItem(file));
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, R.string.message_failed_to_list_files, Toast.LENGTH_SHORT).show();
-                    new AlertDialog.Builder(context)
-                            .setTitle(R.string.message_failed_to_list_files)
-                            .setMessage(e.toString())
-                            .show();
-                }
-            }
-        } else {
-            if (fileF.getAbsolutePath().equals(FilePaths.getRootPath())) {
-                String sdcard = FilePaths.getSdcard().getAbsolutePath();
-                String system = FilePaths.getSystemPart().getAbsolutePath();
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle(R.string.dialog_title_notice);
-                dialog.setMessage(String.format(getString(R.string.dialog_higher_version_os_unaccessable_root_directory_message), system, sdcard));
-                dialog.setPositiveButton(R.string.dialog_higher_version_os_unaccessable_root_directory_goto_sdcard, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        goToFile(sdcard);
-                    }
-                });
-                dialog.setNeutralButton(R.string.dialog_higher_version_os_unaccessable_root_directory_goto_system, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        goToFile(system);
-                    }
-                });
-                dialog.show();
-            }
-        }
-        folders.addAll(files);
-
-        FilesAdapter filesAdapter = new FilesAdapter(context, folders);
-        //View c = filesAdapter.convertView;
-        //ViewGroup g = filesAdapter.parent;
-        filesListView.setAdapter(filesAdapter);
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < files.size(); i++) {
-                    if (files.get(i).getType() == FileType.APK || files.get(i).getType() == FileType.PICTURE || files.get(i).getType() == FileType.VIDEO) {
-                        int finalI = i;
-                        runOnUiThread(() -> {
-                            ((ImageView) filesAdapter.getView(finalI, c, g).findViewById(R.id.file_icon)).setImageDrawable(files.get(finalI).getIcon());
-                            filesListView.setAdapter(filesAdapter);
+                            });
+                            dialog.show();
                         });
-                    }
+                    });
                 }
             }
-        }).start();*/
-        setTitle(fileF.getAbsolutePath());
-        initPosition();
+
+            if (accessMode == 0) {
+                runOnUiThread(() -> warning.setVisibility(View.GONE));
+
+                File[] filesArray = dir.listFiles();
+                if (filesArray != null && filesArray.length > 0) {
+                    for (File file : filesArray) {
+                        if (file.getName().startsWith(".") && !showHiddenFiles) continue;
+                        (file.isDirectory() ? folders : files).add(new FileItem(file));
+                    }
+                }
+            } else if (accessMode == 1) {
+
+                runOnUiThread(() -> {
+                    swipeRefreshLayout.setRefreshing(true);
+                    warning.setVisibility(View.GONE);
+                });
+                a:
+                try {
+                    String dirPath = PathUtils.toDirectoryPath(dir.getAbsolutePath());
+                    List<String> results;
+                    boolean isStat;
+                    try {
+                        Shell.Result result = ShellUtils.executeSuCommand("stat -c '" + StatParser.STAT_FORMAT + "' '" + dirPath + "'*" + (showHiddenFiles ? (" '" + dirPath + "'.*") : ""));
+                        if (result.isSuccess()) {
+                            results = result.getOut();
+                            isStat = true;
+                        } else {
+                            results = ShellUtils.executeSuCommand("ls -l " + (showHiddenFiles ? "-a " : "") + "'" + dirPath + "'").getOut();
+                            isStat = false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        break a;
+                    }
+                    try {
+                        ShellUtils.executeSuCommand("mount -o rw,remount '" + dir.getAbsolutePath() + "'");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    for (String result : results) {
+                        try {
+                            RootFileItem rootFileItem = isStat ? RootFileItem.parseStat(result) : RootFileItem.parseLs(result, dir.getAbsolutePath());
+                            if (rootFileItem == null || ".".equals(rootFileItem.getFileName()) || "..".equals(rootFileItem.getFileName()))
+                                continue;
+                            (rootFileItem.isDirectory() ? folders : files).add(rootFileItem);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        Toast.makeText(context, R.string.message_failed_to_list_files, Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(context)
+                                .setTitle(R.string.message_failed_to_list_files)
+                                .setMessage(e.toString())
+                                .show();
+                    });
+                }
+            }
+
+
+            if (sort == SortMethod.BY_SIZE || sort == SortMethod.BY_SIZE_REVERSED) {
+                Collections.sort(folders, SortMethod.BY_NAME.comparator);
+            } else {
+                Collections.sort(folders, sort.comparator);
+            }
+            Collections.sort(files, sort.comparator);
+
+            if (!dir.getAbsolutePath().equals("/")) {
+                FileItem backer = new FileItem(new File(".."), true);
+                folders.add(0, backer);
+            }
+
+            folders.addAll(files);
+        /*if(folders.size()>1&&warning.getVisibility()==View.VISIBLE){
+            warning.setVisibility(View.GONE);
+        }*/
+            {
+                ListAdapter old = filesListView.getAdapter();
+                if (old instanceof FilesAdapter) {
+                    ((FilesAdapter) old).interruptThreads();
+                }
+            }
+
+            if (Boolean.TRUE.equals(interrupts.get(dir))) {
+                interrupts.remove(dir);
+                return;
+            }
+            interrupts.remove(dir);
+
+            getSharedPreferences().edit().putString("lastPath", dir.getAbsolutePath()).apply();
+
+            FilesAdapter filesAdapter = new FilesAdapter(context, folders);
+            runOnUiThread(() -> {
+                setTitle(dir.getAbsolutePath());
+                filesListView.setAdapter(filesAdapter);
+                initPosition();
+                swipeRefreshLayout.setRefreshing(false);
+            });
+        }).start();
     }
 
-    void initListeners(){
+    void initListeners() {
         title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -394,20 +366,20 @@ public class FileManagerActivity extends BaseActivity {
         filesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FileItem item=(FileItem)filesListView.getItemAtPosition(position);
-                File file=item.getFile();
-                if(file.isDirectory()) {
+                AbstractFileItem item = (AbstractFileItem) filesListView.getItemAtPosition(position);
+                if (item.isDirectory()) {
                     if (item.isBacker()) {
                         back();
                         //goToFile(currentFile.getParentFile().getAbsolutePath());
                         //initFiles(currentFile);
                     } else {
-                        goToFile(file.getAbsolutePath());
+                        goToFile(item.getAbsolutePath());
                         //initFiles(file);
                     }
-                }else{
-                    FileOperations.openFile(context,item,file);
+                } else {
+                    FileOperations.openFile(context, item);
                 }
+                fab_buttons.close(true);
             }
         });
         createFolder.setOnClickListener(new View.OnClickListener() {
@@ -425,7 +397,6 @@ public class FileManagerActivity extends BaseActivity {
             }
         });
 
-
         filesListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -435,7 +406,9 @@ public class FileManagerActivity extends BaseActivity {
                 menu.add(0, FILE_ACTION_COPY_NUMBER, 0, getText(R.string.file_action_copy));
                 menu.add(0, FILE_ACTION_MOVE_NUMBER, 0, getText(R.string.file_action_move));
                 menu.add(0, FILE_ACTION_DELETE_NUMBER, 0, getText(R.string.file_action_delete));
+                menu.add(0, FILE_ACTION_CHECKSUM_NUMBER, 0, getText(R.string.file_action_checksum));
                 menu.add(0, FILE_ACTION_ATTRIBUTES_NUMBER, 0, getText(R.string.file_action_attribute));
+                fab_buttons.close(true);
             }
         });
     }
@@ -451,46 +424,62 @@ public class FileManagerActivity extends BaseActivity {
         });
     }
 
-    void showCreateFolderDialog(){
-        FileOperationsDialogs.showCreateFolderDialog(context, currentFile, () -> initFiles(currentFile));
+    void showCreateFolderDialog() {
+        putPosition();
+        FileOperationsDialogs.showCreateFolderDialog(context, currentFile, () -> initFiles(currentFile), accessMode);
     }
 
-    void showCreateFileDialog(){
-        FileOperationsDialogs.showCreateFileDialog(context, currentFile, () -> initFiles(currentFile));
+    void showCreateFileDialog() {
+        putPosition();
+        FileOperationsDialogs.showCreateFileDialog(context, currentFile, () -> initFiles(currentFile), accessMode);
     }
 
-    void putPosition(){
+    void putPosition() {
         int index = filesListView.getFirstVisiblePosition();
         View v = filesListView.getChildAt(0);
         int top = (v == null) ? 0 : v.getTop();
-        position.put(currentFile,index+"/"+top);
+        position.put(currentFile, index + "/" + top);
     }
 
-    void goToFile(String path){
-        File newFile=new File(path);
-        if(!newFile.exists()){
+    public void goToFile(String path) {
+        File newFile = new File(path);
+        /*if (!newFile.exists()) {
+            warning.setVisibility(View.VISIBLE);
+            warning.setOnClickListener((v)->{
+                new AlertDialog.Builder(context)
+                        .setTitle(R.string.dialog_title_notice)
+                        .setMessage(String.format(getString(R.string.message_go_to_file_not_exists),path))
+                        .show();
+            });
+        }else{
+            warning.setVisibility(View.GONE);
+        }*/
+        if (newFile.isFile()) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.dialog_title_notice)
-                    .setMessage(String.format(getString(R.string.message_go_to_file_not_exists),path))
-                    .show();
-            return;
-        }
-        if(newFile.isFile()){
-            new AlertDialog.Builder(context)
-                    .setTitle(R.string.dialog_title_notice)
-                    .setMessage(String.format(getString(R.string.message_go_to_file_is_file),path))
+                    .setMessage(String.format(getString(R.string.message_go_to_file_is_file), path))
                     .show();
             return;
         }
 
         putPosition();
-        currentFile=newFile;
-        initFiles(currentFile);
-        setTitle(path);
-        getSharedPreferences().edit().putString("lastPath",path).apply();
+        initFiles(newFile);
     }
 
-    void getPermission(Permission permission){
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private void getPermissionNew() {
+        dialog_no_permissions = new AlertDialog.Builder(this);
+        dialog_no_permissions.setTitle(getText(R.string.dialog_no_permissions_title))
+                .setMessage(getText(R.string.dialog_no_permissions_message_new))
+                .setPositiveButton(getText(R.string.dialog_no_permissions_button_gotosettings), (dialog, which) -> startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).setData(Uri.parse("package:com.mrshiehx.file.manager"))))
+                .setNegativeButton(getText(android.R.string.cancel), (dialog, which) -> MSFMApplication.getInstance().exit())
+                .setCancelable(false);
+        if (dialog_no_permissions_dialog == null || !dialog_no_permissions_dialog.isShowing())
+            dialog_no_permissions_dialog = dialog_no_permissions.show();
+    }
+
+    void getPermission(Permission permission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ps = shouldShowRequestPermissionRationale(permission.getName());
         }
@@ -500,16 +489,16 @@ public class FileManagerActivity extends BaseActivity {
         }
     }
 
-    void startRequestPermission(){
-        if(!ps) {
+    void startRequestPermission() {
+        if (!ps) {
             ActivityCompat.requestPermissions(this, SharedVariables.getPermissions(), REQUEST_CODE_GET_PERMISSION);
-        }else{
+        } else {
             showDialogTipUserGoToAppSettting();
         }
     }
 
-    void back(){
-        if(!Utils.isEmpty(currentFile.getParent())&&!currentFile.getAbsolutePath().equals(FilePaths.getRootPath())) {
+    void back() {
+        if (!Utils.isEmpty(currentFile.getParent()) && !currentFile.getAbsolutePath().equals("/")) {
             /*int index=0;
             int top=0;
             try {
@@ -521,12 +510,12 @@ public class FileManagerActivity extends BaseActivity {
                 }
             }catch (Throwable ignore){}*/
 
-            File oldCurrentFile=currentFile;
+            File oldCurrentFile = currentFile;
             goToFile(currentFile.getParent());
             position.remove(oldCurrentFile);
-            initPosition();
+            //initPosition();
             //filesListView.setSelectionFromTop(index, top);
-        }else{
+        } else {
             long secondTime = System.currentTimeMillis();
             if (secondTime - firstTime > 2000) {
                 Toast.makeText(this, getResources().getText(R.string.message_press_again_exit_application), Toast.LENGTH_SHORT).show();
@@ -548,9 +537,8 @@ public class FileManagerActivity extends BaseActivity {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem menuItem) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-        final long selectedId=info.id;
-        FileItem item = (FileItem) filesListView.getItemAtPosition((int) selectedId);
-        File file=item.getFile();
+        final long selectedId = info.id;
+        AbstractFileItem item = (AbstractFileItem) filesListView.getItemAtPosition((int) selectedId);
         switch (menuItem.getItemId()) {
             /*case FILE_ACTION_OPEN_NUMBER:
                 if(!item.isBacker()){
@@ -564,55 +552,148 @@ public class FileManagerActivity extends BaseActivity {
                 }
                 return true;*/
             case FILE_ACTION_CHOOSE_OPEN_METHOD_NUMBER:
-                if(!item.isBacker()) {
-                    if(file.isFile()){
-                        FileOperationsDialogs.showOpenMethodDialog(context,file);
-                    }else{
+                if (!item.isBacker()) {
+                    if (!item.isDirectory()) {
+                        FileOperationsDialogs.showOpenMethodDialog(context, item);
+                    } else {
                         Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case FILE_ACTION_RENAME_NUMBER:
-                if(!item.isBacker()){
-                    FileOperationsDialogs.showRenameDialog(context, file, () -> initFiles(currentFile));
-                }else{
+                if (!item.isBacker()) {
+                    putPosition();
+                    FileOperationsDialogs.showRenameDialog(context, item, () -> initFiles(currentFile));
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case FILE_ACTION_COPY_NUMBER:
-                if(!item.isBacker()){
-                    copingFile=file;
-                    movingFile=null;
-                }else{
+                if (!item.isBacker()) {
+                    copingFile = item;
+                    movingFile = null;
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case FILE_ACTION_MOVE_NUMBER:
-                if(!item.isBacker()){
-                    movingFile=file;
-                    copingFile=null;
-                }else{
+                if (!item.isBacker()) {
+                    movingFile = item;
+                    copingFile = null;
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case FILE_ACTION_DELETE_NUMBER:
-                if(!item.isBacker()){
-                    FileOperationsDialogs.showDeleteFileDialog(context,file, new Void() {
-                        @Override
-                        public void execute() {
-                            initFiles(currentFile);
-                        }
-                    });
-                }else{
+                if (!item.isBacker()) {
+                    putPosition();
+                    FileOperationsDialogs.showDeleteFileDialog(context, item, () -> initFiles(currentFile));
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
+            case FILE_ACTION_CHECKSUM_NUMBER:
+                if (item.isDirectory()) {
+                    Toast.makeText(context, R.string.message_checksum_on_folder, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                try {
+                    byte[] bytes = item.getFileBytes();
+                    if (bytes == null) {
+                        Toast.makeText(context, R.string.message_failed_to_read_file, Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                    dialog.setTitle(R.string.file_action_checksum);
+                    final View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_file_checksum, null);
+                    dialog.setView(dialogView);
+                    EditText crc32 = dialogView.findViewById(R.id.crc32);
+                    EditText md5 = dialogView.findViewById(R.id.md5);
+                    EditText sha1 = dialogView.findViewById(R.id.sha1);
+                    EditText sha224 = dialogView.findViewById(R.id.sha224);
+                    EditText sha256 = dialogView.findViewById(R.id.sha256);
+                    EditText sha384 = dialogView.findViewById(R.id.sha384);
+                    EditText sha512 = dialogView.findViewById(R.id.sha512);
+                    EditText paste_et = dialogView.findViewById(R.id.paste_et);
+                    Button copy_crc32 = dialogView.findViewById(R.id.copy_crc32);
+                    Button copy_md5 = dialogView.findViewById(R.id.copy_md5);
+                    Button copy_sha1 = dialogView.findViewById(R.id.copy_sha1);
+                    Button copy_sha224 = dialogView.findViewById(R.id.copy_sha224);
+                    Button copy_sha256 = dialogView.findViewById(R.id.copy_sha256);
+                    Button copy_sha384 = dialogView.findViewById(R.id.copy_sha384);
+                    Button copy_sha512 = dialogView.findViewById(R.id.copy_sha512);
+                    Button paste = dialogView.findViewById(R.id.paste);
+                    TextView match = dialogView.findViewById(R.id.match);
+
+                    Map<String, String> map = new HashMap<>();
+                    map.put("MD5", BytesUtils.getMD5(bytes).toLowerCase());
+                    map.put("CRC32", BytesUtils.getCRC32(bytes).toLowerCase());
+                    map.put("SHA1", BytesUtils.getSHA1(bytes).toLowerCase());
+                    map.put("SHA224", BytesUtils.getSHA224(bytes).toLowerCase());
+                    map.put("SHA256", BytesUtils.getSHA256(bytes).toLowerCase());
+                    map.put("SHA384", BytesUtils.getSHA384(bytes).toLowerCase());
+                    map.put("SHA512", BytesUtils.getSHA512(bytes).toLowerCase());
+                    crc32.setText(map.get("CRC32"));
+                    md5.setText(map.get("MD5"));
+                    sha1.setText(map.get("SHA1"));
+                    sha224.setText(map.get("SHA224"));
+                    sha256.setText(map.get("SHA256"));
+                    sha384.setText(map.get("SHA384"));
+                    sha512.setText(map.get("SHA512"));
+                    copy_crc32.setOnClickListener((v) -> SystemUtils.copy(map.get("CRC32")));
+                    copy_md5.setOnClickListener((v) -> SystemUtils.copy(map.get("MD5")));
+                    copy_sha1.setOnClickListener((v) -> SystemUtils.copy(map.get("SHA1")));
+                    copy_sha224.setOnClickListener((v) -> SystemUtils.copy(map.get("SHA224")));
+                    copy_sha256.setOnClickListener((v) -> SystemUtils.copy(map.get("SHA256")));
+                    copy_sha384.setOnClickListener((v) -> SystemUtils.copy(map.get("SHA384")));
+                    copy_sha512.setOnClickListener((v) -> SystemUtils.copy(map.get("SHA512")));
+                    paste.setOnClickListener((v) -> paste_et.setText(SystemUtils.getClipboardContent()));
+
+                    paste_et.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            if (!Utils.isEmpty(s)) {
+                                match.setVisibility(View.VISIBLE);
+                                String s1 = s.toString();
+                                for (Map.Entry<String, String> entry : map.entrySet()) {
+                                    if (s1.equalsIgnoreCase(entry.getValue())) {
+                                        match.setTextColor(Color.parseColor("#00FF00"));
+                                        match.setText(getString(R.string.file_checksum_match_with, entry.getKey()));
+                                        break;
+                                    } else {
+                                        match.setTextColor(Color.parseColor("#FF0000"));
+                                        match.setText(R.string.file_checksum_no_match);
+                                    }
+                                }
+                            } else {
+                                match.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+                    });
+                    dialog.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, getString(R.string.message_operation_failed_with_exception, e), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, Arrays.toString(e.getStackTrace()), Toast.LENGTH_SHORT).show();
+                }
+                return true;
             case FILE_ACTION_ATTRIBUTES_NUMBER:
-                if(!item.isBacker()){
-                    FileOperationsDialogs.showAttributesDialog(context,item,file);
-                }else{
+                if (!item.isBacker()) {
+                    FileOperationsDialogs.showAttributesDialog(context, item);
+                } else {
                     Toast.makeText(context, R.string.message_unsupported_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
@@ -624,19 +705,20 @@ public class FileManagerActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode==REQUEST_CODE_GET_PERMISSION){
+        if (requestCode == REQUEST_CODE_GET_PERMISSION) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     boolean b = shouldShowRequestPermissionRationale(permissions[0]);
                     if (b) {
                         showDialogTipUserGoToAppSettting();
-                    } else {
+                    } /*else {
                         MSFMApplication.getInstance().exit();
-                    }
+                    }*/
                 }
             }
         }
     }
+
     private void showDialogTipUserGoToAppSettting() {
         dialog_no_permissions = new AlertDialog.Builder(this);
         dialog_no_permissions.setTitle(getText(R.string.dialog_no_permissions_title))
@@ -647,24 +729,24 @@ public class FileManagerActivity extends BaseActivity {
                         goToAppSetting();
                     }
                 }).setNegativeButton(getText(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                MSFMApplication.getInstance().exit();
-            }
-        }).setCancelable(false);
-        dialog_no_permissions_dialog=dialog_no_permissions.show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MSFMApplication.getInstance().exit();
+                    }
+                }).setCancelable(false);
+        dialog_no_permissions_dialog = dialog_no_permissions.show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_GO_TO_SETTINGS) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 int i = ContextCompat.checkSelfPermission(context, SharedVariables.getPermissions()[0]);
                 if (i != PackageManager.PERMISSION_GRANTED) {
                     showDialogTipUserGoToAppSettting();
                 } else {
-                    if (dialog_no_permissions_dialog != null&&dialog_no_permissions_dialog.isShowing()) {
+                    if (dialog_no_permissions_dialog != null && dialog_no_permissions_dialog.isShowing()) {
                         dialog_no_permissions_dialog.dismiss();
                     }
                 }
@@ -681,15 +763,15 @@ public class FileManagerActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        getSharedPreferences().edit().putString("lastPath",currentFile.getAbsolutePath()).apply();
+        getSharedPreferences().edit().putString("lastPath", currentFile.getAbsolutePath()).apply();
         putPosition();
 
     }
 
-    void initPosition(){
-        if(position.containsKey(currentFile)){
-            int index=0;
-            int top=0;
+    void initPosition() {
+        if (position.containsKey(currentFile)) {
+            int index = 0;
+            int top = 0;
             try {
                 String s = position.get(currentFile);
                 if (!Utils.isEmpty(s)) {
@@ -697,7 +779,8 @@ public class FileManagerActivity extends BaseActivity {
                     index = Integer.parseInt(ss[0]);
                     top = Integer.parseInt(ss[1]);
                 }
-            }catch (Throwable ignore){}
+            } catch (Throwable ignore) {
+            }
             filesListView.setSelectionFromTop(index, top);
         }
     }
@@ -705,134 +788,154 @@ public class FileManagerActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                getPermissionNew();
+            } else {
+                if (dialog_no_permissions_dialog != null && dialog_no_permissions_dialog.isShowing())
+                    dialog_no_permissions_dialog.dismiss();
+            }
+        }
         initFiles(currentFile);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            /*if (copyingThread != null) {
+                long secondTime = System.currentTimeMillis();
+                if (secondTime - firstTime > 2000) {
+                    Toast.makeText(this, getResources().getText(R.string.message_press_again_stop_operating), Toast.LENGTH_SHORT).show();
+                    firstTime = secondTime;
+                } else {
+                    copyingThread.interrupt();
+                }
+            } else {*/
             back();
-        }else{
-            super.onKeyDown(keyCode, event);
+            //}
+            return true;
         }
-        return true;
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
-        MenuItem sort=menu.findItem(R.id.action_sort_method);
-        MenuItem paste=menu.findItem(R.id.action_paste);
+        MenuItem sort = menu.findItem(R.id.action_sort_method);
+        MenuItem paste = menu.findItem(R.id.action_paste);
         //initSortMethod();
-        if(sort!=null)
-            sort.setTitle(String.format(getString(R.string.action_sort_method),sortMethod.getDisplayName()));
-        if(paste!=null)
-            paste.setEnabled((copingFile!=null&&!copingFile.getParentFile().equals(currentFile))||(movingFile!=null&&!movingFile.getParentFile().equals(currentFile)));
+        if (sort != null)
+            sort.setTitle(String.format(getString(R.string.action_sort_method), sortMethod.getDisplayName()));
+        if (paste != null)
+            paste.setEnabled((copingFile != null && !copingFile.getParent().equals(currentFile.getAbsolutePath())) || (movingFile != null && !movingFile.getParent().equals(currentFile.getAbsolutePath())));
         return super.onMenuOpened(featureId, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-            case R.id.action_exit:
-                new AlertDialog.Builder(this)
-                        .setTitle(getText(R.string.dialog_title_notice))
-                        .setMessage(getText(R.string.dialog_exit_message))
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .setPositiveButton(android.R.string.yes, (dialog, which) -> MSFMApplication.getInstance().exit()).show();
-                break;
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_exit) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getText(R.string.dialog_title_notice))
+                    .setMessage(getText(R.string.dialog_exit_message))
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> MSFMApplication.getInstance().exit()).show();
             /*case R.id.action_about:
                 showAboutDialog();
+            return true;
                 break;*/
-            case R.id.action_back:
-                back();
-                break;
-            case R.id.action_create_a_folder:
-                showCreateFolderDialog();
-                break;
-            case R.id.action_create_a_file:
-                showCreateFileDialog();
-                break;
-            case R.id.action_sort_method:
-                SortMethod[] items = {SortMethod.BY_NAME, SortMethod.BY_DATE};
-                CharSequence[] itemNames = {SortMethod.BY_NAME.getDisplayName(), SortMethod.BY_DATE.getDisplayName()};
-                if (sortMethod == items[0]) {
-                    sortMethodNumber = 0;
-                } else {
-                    sortMethodNumber = 1;
+        } else if (id == R.id.action_back) {
+            back();
+            return true;
+        } else if (id == R.id.action_create_a_folder) {
+            showCreateFolderDialog();
+            return true;
+        } else if (id == R.id.action_create_a_file) {
+            showCreateFileDialog();
+            return true;
+        } else if (id == R.id.action_sort_method) {
+            SortMethod[] items = {SortMethod.BY_NAME, SortMethod.BY_DATE, SortMethod.BY_NAME_REVERSED, SortMethod.BY_DATE_REVERSED, SortMethod.BY_SIZE, SortMethod.BY_SIZE_REVERSED};
+            CharSequence[] itemNames = {SortMethod.BY_NAME.getDisplayName(), SortMethod.BY_DATE.getDisplayName(), SortMethod.BY_NAME_REVERSED.getDisplayName(), SortMethod.BY_DATE_REVERSED.getDisplayName(), SortMethod.BY_SIZE.getDisplayName(), SortMethod.BY_SIZE_REVERSED.getDisplayName()};
+            sortMethodNumber = sortMethod.ordinal();
+            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialog.setTitle(getText(R.string.dialog_sort_method_title));
+            dialog.setSingleChoiceItems(itemNames, sortMethodNumber, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    sortMethodNumber = which;
                 }
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle(getText(R.string.dialog_sort_method_title));
-                dialog.setSingleChoiceItems(itemNames, sortMethodNumber, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        sortMethodNumber = which;
+            });
+            dialog.setPositiveButton(getText(android.R.string.yes), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (sortMethodNumber != -1) {
+                        sortMethod = items[sortMethodNumber];
                     }
-                });
-                dialog.setPositiveButton(getText(android.R.string.yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (sortMethodNumber != -1) {
-                            sortMethod = items[sortMethodNumber];
-                        }/*
-                        if (which == 1) {
-                            sortMethod = SortMethod.BY_DATE;
-                        } else {
-                            sortMethod = SortMethod.BY_NAME;
-                        }*/
-                        getSharedPreferences().edit().putString("sort", sortMethod.getName()).apply();
-                        initFiles(currentFile);
-                    }
-                });
-                dialog.show();
-                break;
-            case R.id.action_paste:
-                if(copingFile!=null){
-                    if (!copingFile.getParentFile().equals(currentFile)) {
-                        if (copingFile.exists()) {
-                            FileOperationsDialogs.showCopyDialog(context, copingFile, currentFile, () -> {
-                                copingFile = null;
-                                initFiles(currentFile);
-                            });
-                        } else {
-                            Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
-                            copingFile=null;
-                        }
-                    } else {
-                        Toast.makeText(context, getText(R.string.message_paste_to_the_same_directory), Toast.LENGTH_SHORT).show();
-                    }
-                }else if(movingFile!=null){
-                    if (!movingFile.getParentFile().equals(currentFile)) {
-                        if (movingFile.exists()) {
-                            movingFile.renameTo(new File(currentFile, movingFile.getName()));
-                            movingFile = null;
+                    getSharedPreferences().edit().putString("sort", sortMethod.getName()).apply();
+                    initFiles(currentFile);
+                }
+            });
+            dialog.show();
+            return true;
+        } else if (id == R.id.action_paste) {
+            if (copingFile != null) {
+                if (!copingFile.getParent().equals(currentFile.getAbsolutePath())) {
+                    if (copingFile.exists()) {
+                        FileOperationsDialogs.showCopyDialog(activity, copingFile, currentFile, () -> {
+                            copingFile = null;
+                            //copyingThread = null;
                             initFiles(currentFile);
-
-                            /*FileOperationsDialogs.showMoveDialog(context, movingFile, currentFile, () -> {
-                                if(movingFile.isDirectory()) FileUtils.deleteDirectory(movingFile);
-                                else movingFile.delete();
-                                movingFile = null;
-                                initFiles(currentFile);
-                            });*/
-                        } else {
-                            Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
-                            movingFile = null;
-                        }
+                        }, () -> {
+                            copingFile = null;
+                            //copyingThread = null;
+                            initFiles(currentFile);
+                        });
                     } else {
-                        Toast.makeText(context, getText(R.string.message_paste_moved_to_the_same_directory), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
+                        copingFile = null;
                     }
-                }else{
-                    Toast.makeText(context, getText(R.string.message_no_pasteable_file), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, getText(R.string.message_paste_to_the_same_directory), Toast.LENGTH_SHORT).show();
                 }
+            } else if (movingFile != null) {
+                if (movingFile.getParent().equals(currentFile.getAbsolutePath())) {
+                    Toast.makeText(context, getText(R.string.message_paste_moved_to_the_same_directory), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                if (!movingFile.exists()) {
+                    Toast.makeText(context, R.string.message_target_file_not_exists, Toast.LENGTH_SHORT).show();
+                    movingFile = null;
+                    return true;
+                }
+                boolean success;
+                if (movingFile instanceof FileItem && Utils.isRootFileWithDeviceStatus(currentFile)) {
+                    try {
+                        success = ShellUtils.executeSuCommand("mv '" + movingFile.getAbsolutePath() + "' '" + new File(currentFile, movingFile.getFileName()).getAbsolutePath() + "'").isSuccess();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        success = false;
+                    }
+                } else
+                    success = movingFile.renameTo(new File(currentFile, movingFile.getFileName()));
+                if (success) {
+                    movingFile = null;
+                    Toast.makeText(context, R.string.message_success_move_files, Toast.LENGTH_SHORT).show();
+                    initFiles(currentFile);
+                } else {
+                    Toast.makeText(context, R.string.message_failed_to_move_files, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, getText(R.string.message_no_pasteable_file), Toast.LENGTH_SHORT).show();
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void setTitle(CharSequence title){
+    public void setTitle(CharSequence title) {
         this.title.setText(title);
     }
 
@@ -840,28 +943,3 @@ public class FileManagerActivity extends BaseActivity {
         return this.title.getText();
     }
 }
-/**useless code*/
-/**void showAboutDialog(){
- new AlertDialog.Builder(this)
- .setTitle(String.format(getString(R.string.dialog_about_title), ApplicationUtils.getVersionName(),ApplicationUtils.getVersionCode()))
- .setMessage(R.string.dialog_about_message)
- .setPositiveButton(R.string.dialog_about_visit_github_of_this_application, new DialogInterface.OnClickListener() {
-@Override
-public void onClick(DialogInterface dialog, int which) {
-Utils.goToWebsite(context,"https://github.com/MrShieh-X/msfilemanager");
-}
-})
- .setNegativeButton(R.string.dialog_about_visit_github_of_author, new DialogInterface.OnClickListener() {
-@Override
-public void onClick(DialogInterface dialog, int which) {
-Utils.goToWebsite(context,"https://github.com/MrShieh-X");
-}
-})
- .setNeutralButton(R.string.dialog_about_visit_msxw, new DialogInterface.OnClickListener() {
-@Override
-public void onClick(DialogInterface dialog, int which) {
-Utils.goToWebsite(context,"https://mrshieh-x.github.io");
-}
-}).show();
- }
- */

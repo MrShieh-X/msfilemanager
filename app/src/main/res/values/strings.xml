@@ -7,7 +7,7 @@
     <string name="activity_pictureviewer_name">Picture Viewer</string>
 
     <string name="action_exit_name">Exit</string>
-    <string name="action_goto_dir_name">Go To Dir</string>
+    <string name="action_goto_dir_name">Go To Directory</string>
     <string name="action_create_name">Create...</string>
     <string name="action_create_a_folder_name">Create a new folder</string>
     <string name="action_create_a_file_name">Create a new file</string>
@@ -20,24 +20,24 @@
 
     <string name="dialog_title_notice">Notice</string>
     <string name="dialog_exit_message">Are you sure to exit?</string>
-    <string name="dialog_about_visit_msxw">Access MSXW</string>
-    <string name="dialog_no_permissions_title">The permissions for this application are not available</string>
-    <string name="dialog_no_permissions_message">Please in the application settings - permissions, allow the application to use storage permissions to manage files</string>
+    <string name="dialog_no_permissions_title">The permission for this application is not available</string>
+    <string name="dialog_no_permissions_message">Please allow the permission of MSFileManager managing files in the application settings - permissions</string>
+    <string name="dialog_no_permissions_message_new">Please click the button \"Go To Settings\" and tick the checkbox \"Allow access to manage all files\".</string>
     <string name="dialog_no_permissions_button_gotosettings">Go To Settings</string>
     <string name="dialog_delete_file_message">Are you sure you want to delete the file \"%s\"?</string>
-    <string name="dialog_file_attribute_name">Name: %s</string>
-    <string name="dialog_file_attribute_type">Type: %s</string>
-    <string name="dialog_file_attribute_directory">Directory: %s</string>
-    <string name="dialog_file_attribute_path">Path: %s</string>
-    <string name="dialog_file_attribute_date">Modified date: %s</string>
-    <string name="dialog_file_attribute_size">Size: %1$s (%2$s)</string>
-    <string name="dialog_file_attribute_folders">Number of sub-folders: %s</string>
-    <string name="dialog_file_attribute_files">Number of sub-files: %s</string>
+    <string name="dialog_file_attribute_name">Name</string>
+    <string name="dialog_file_attribute_type">Type</string>
+    <string name="dialog_file_attribute_directory">Directory</string>
+    <string name="dialog_file_attribute_path">Path</string>
+    <string name="dialog_file_attribute_date">Modified Date</string>
+    <string name="dialog_file_attribute_size">Size</string>
+    <string name="dialog_file_attribute_folders">Number of sub-folders</string>
+    <string name="dialog_file_attribute_files">Number of sub-files</string>
     <string name="dialog_file_attribute_calculating">Calculating...</string>
+    <string name="dialog_file_attribute_linkto">Link to</string>
     <string name="dialog_sort_method_title">Sort Method</string>
-    <string name="dialog_higher_version_os_unaccessable_root_directory_message">High version Android requires ROOT permission to access the root directory, otherwise, only the system partition (%1$s) and internal storage partition (%2$s) can be accessed.</string>
+    <string name="dialog_higher_version_os_unaccessable_root_directory_message">Accessing some system directories requires ROOT permission. Please ensure that your device has ROOT permission and go to the settings to enable the "Request ROOT permission at startup" option, otherwise maybe only the internal storage partition (%1$s) is readable and writable.</string>
     <string name="dialog_higher_version_os_unaccessable_root_directory_goto_sdcard">Go To Internal Storage Partition</string>
-    <string name="dialog_higher_version_os_unaccessable_root_directory_goto_system">Go To The System Partition</string>
     <string name="dialog_rename_title">Rename File</string>
     <string name="dialog_apk_details_package_name_text">"Package Name: "</string>
     <string name="dialog_apk_details_version_code_text">"Version Code: "</string>
@@ -46,9 +46,6 @@
     <string name="dialog_file_copy_current">"Current File: "</string>
     <string name="dialog_file_copy_source">"Source File: "</string>
     <string name="dialog_file_copy_to">"Copy To: "</string>
-    <string name="dialog_file_move_to">"Move To: "</string>
-    <string name="dialog_file_move_title">Move Files</string>
-    <string name="dialog_file_copy_total">"Total Number of Files: "</string>
     <string name="dialog_file_copy_remaining">"Remaining Files: "</string>
     <string name="dialog_copy_file_exists_replace">Replace</string>
     <string name="dialog_copy_file_exists_skip">Skip</string>
@@ -61,6 +58,7 @@
     <string name="dialog_files_them_failed_to_copy_title">Files that failed to copy</string>
     <string name="dialog_audio_player_button_play">Play</string>
     <string name="dialog_audio_player_button_stop">Pause</string>
+    <string name="dialog_modify_date_title">Modify the modification date</string>
 
     <string name="preference_settings_category_appearance_title">Appearance</string>
     <string name="preference_settings_dark_theme_title">Dark Theme</string>
@@ -74,7 +72,7 @@
     <string name="preference_settings_show_hidden_files_summary">Display the file or directory whose name starts with \".\"</string>
     <string name="preference_settings_home_title">Set Home</string>
     <string name="preference_settings_category_advance_title">Advance</string>
-    <string name="preference_settings_get_root_title">Get ROOT permission at startup</string>
+    <string name="preference_settings_get_root_title">Request ROOT permission at startup</string>
     <string name="preference_settings_get_root_summary">Get ROOT permission to modify system files</string>
     <string name="preference_settings_about_title">About This Application</string>
     <string name="preference_settings_author_title">Author</string>
@@ -91,15 +89,27 @@
     <string name="file_type_audio">Audio</string>
     <string name="file_type_picture">Picture</string>
     <string name="file_type_apk">Application Package</string>
+    <string name="file_type_file_link">File Link</string>
+    <string name="file_type_folder_link">Folder Link</string>
     <string name="file_sort_method_name">By Name</string>
     <string name="file_sort_method_date">By Date</string>
+    <string name="file_sort_method_size">By Size</string>
+    <string name="file_sort_method_name_reversed">By Name (reversed)</string>
+    <string name="file_sort_method_date_reversed">By Date (reversed)</string>
+    <string name="file_sort_method_size_reversed">By Size (reversed)</string>
     <string name="file_action_open">Open</string>
     <string name="file_action_choose_open_method">Choose a Open Method</string>
     <string name="file_action_rename">Rename</string>
     <string name="file_action_copy">Copy</string>
     <string name="file_action_move">Move</string>
     <string name="file_action_delete">Delete</string>
+    <string name="file_action_checksum">Checksum</string>
     <string name="file_action_attribute">Attributes</string>
+    <string name="file_checksum_action_copy">Copy</string>
+    <string name="file_checksum_action_paste">Paste</string>
+    <string name="file_checksum_paste_and_verify">Paste and verify</string>
+    <string name="file_checksum_no_match">No match</string>
+    <string name="file_checksum_match_with">Match with %s</string>
     <string name="file_viewer_hex_editor">HEX Editor</string>
     <string name="file_viewer_apk">Application Package</string>
     <string name="file_viewer_text_editor">Text Editor</string>
@@ -108,7 +118,8 @@
     <string name="file_viewer_more">More... (default type)</string>
     <string name="file_viewer_more_all_types">More... (all types)</string>
 
-    <string name="message_failed_to_get_root">Failed to get ROOT permission</string>
+    <string name="message_failed_to_get_root">Failed to request ROOT permission</string>
+    <string name="message_failed_to_execute_command_with_error_code">Failed to execute the command. The error code: %d</string>
     <string name="message_press_again_exit_application">Press again to exit this application</string>
     <string name="message_success_copy_current_dir">Copy the path of current directory successfully</string>
     <string name="message_no_mail_app">Mail app is not installed</string>
@@ -135,7 +146,7 @@
     <string name="message_failed_to_copy_files">Failed to copy files</string>
     <string name="message_go_to_file_not_exists">%s: The target directory does not exist</string>
     <string name="message_go_to_file_is_file">%s: The target directory is a file</string>
-    <string name="message_hex_editor_failed_to_read_file">Failed to read this file</string>
+    <string name="message_failed_to_read_file">Failed to read this file</string>
     <string name="message_failed_to_save_file">Failed to save this file</string>
     <string name="message_not_opening_file">No open files</string>
     <string name="message_success_save">Save the file successfully</string>
@@ -144,4 +155,13 @@
     <string name="message_failed_to_load_picture">Failed to load the image</string>
     <string name="message_target_file_not_exists">The target file or folder does not exist</string>
     <string name="message_failed_to_move_files">Failed to move files</string>
+    <string name="message_device_not_root">The device does not have ROOT permission</string>
+    <string name="message_permission_denied">Permission denied</string>
+    <string name="message_read_only">The corresponding operation cannot be performed on the read-only directory</string>
+    <string name="message_checksum_on_folder">Cannot perform target operation on folder</string>
+    <string name="message_operation_failed_with_exception">Operation failed: %s</string>
+    <string name="message_unable_to_mkdir">Unable to create a folder here</string>
+    <string name="message_unable_to_cnf">Unable to create a file here</string>
+    <string name="message_success_move_files">File moved successfully</string>
+    <string name="message_press_again_stop_operating">Press again to stop operating</string>
 </resources>

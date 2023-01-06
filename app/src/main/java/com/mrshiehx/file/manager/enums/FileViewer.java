@@ -4,7 +4,6 @@ import com.mrshiehx.file.manager.R;
 import com.mrshiehx.file.manager.file.openers.APKFileOpener;
 import com.mrshiehx.file.manager.file.openers.AudioFileOpener;
 import com.mrshiehx.file.manager.file.openers.FileOpener;
-import com.mrshiehx.file.manager.file.openers.HEXEditor;
 import com.mrshiehx.file.manager.file.openers.MoreOpenersAllTypes;
 import com.mrshiehx.file.manager.file.openers.MoreOpenersDefaultType;
 import com.mrshiehx.file.manager.file.openers.PictureFileOpener;
@@ -16,7 +15,6 @@ public enum FileViewer {
     PICTURE_VIEWER(ResourceUtils.getTextByLocale(R.string.file_viewer_picture_viewer), new PictureFileOpener()),
     AUDIO_PLAYER(ResourceUtils.getTextByLocale(R.string.file_viewer_audio_player), new AudioFileOpener()),
     APK(ResourceUtils.getTextByLocale(R.string.file_viewer_apk), new APKFileOpener()),
-    HEX_EDITOR(ResourceUtils.getTextByLocale(R.string.file_viewer_hex_editor), new HEXEditor()),
     MORE(ResourceUtils.getTextByLocale(R.string.file_viewer_more), new MoreOpenersDefaultType()),
     MORE_ALL_TYPES(ResourceUtils.getTextByLocale(R.string.file_viewer_more_all_types), new MoreOpenersAllTypes());
 
